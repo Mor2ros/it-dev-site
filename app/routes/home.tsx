@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
-  Code, CheckCircle, Star, Handshake, Laptop, Smartphone, Cloud, Menu, X, Zap, Palette, Rocket, MessageSquare, ChevronRight, Brain, GitFork, Lightbulb, Settings, UserPlus, Award, Users, BookOpen
+  Code, CheckCircle, Star, Handshake, Laptop, Smartphone, Cloud, Menu, X, Zap, Palette, Rocket, MessageSquare, ChevronRight, Brain, GitFork, Lightbulb, Settings, UserPlus, Award, Users, BookOpen, DollarSign, TrendingUp as TrendingUpIcon, Target, ShieldCheck, Briefcase
 } from "lucide-react";
 
 const testimonials = [
@@ -114,11 +114,42 @@ const services = [
   },
 ];
 
+// Fade-in animation hook
+function useFadeInOnView() {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    const observer = new window.IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setVisible(true);
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+  return [ref, visible] as const;
+}
+
+function FadeInSection({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  const [ref, visible] = useFadeInOnView();
+  return (
+    <div
+      ref={ref}
+      className={`transition-opacity duration-1000 ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"} ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
+
 function Header({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div>
+    <>
       <header className="fixed top-0 left-0 w-full bg-gray-950 bg-opacity-95 shadow-lg z-50">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center">
@@ -163,32 +194,34 @@ function Header({ children }: { children: React.ReactNode }) {
         )}
       </header>
       <div className="pt-20 md:pt-24">{children}</div>
-    </div>
+    </>
   );
 }
 
 function Hero() {
   return (
-    <section id="hero" className="bg-gradient-to-r from-blue-900 to-gray-900 text-white py-12 sm:py-16 md:py-24 lg:py-32">
-      <div className="container mx-auto px-2 sm:px-4 flex flex-col md:flex-row items-center justify-between gap-8 md:gap-0">
-        <div className="w-full md:w-1/2 text-center md:text-left mb-8 md:mb-0">
-          <div className="flex items-center justify-center md:justify-start mb-4">
-            <Code className="text-blue-400 w-8 h-8 sm:w-10 sm:h-10 mr-2 sm:mr-3" />
-            <span className="text-3xl sm:text-4xl font-extrabold tracking-tight">AstrikS</span>
+    <section id="hero" className="relative bg-gradient-to-r from-blue-900 to-gray-900 text-white py-12 sm:py-16 md:py-24 lg:py-32 overflow-hidden">
+      <div>
+        <div className="container mx-auto px-2 sm:px-4 flex flex-col md:flex-row items-center justify-between gap-8 md:gap-0">
+          <div className="w-full md:w-1/2 text-center md:text-left mb-8 md:mb-0">
+            <div className="flex items-center justify-center md:justify-start mb-4">
+              <Code className="text-blue-400 w-8 h-8 sm:w-10 sm:h-10 mr-2 sm:mr-3" />
+              <span className="text-3xl sm:text-4xl font-extrabold tracking-tight">AstrikS</span>
+            </div>
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-4 sm:mb-6">
+              Ваш Надежный Партнер в Мире <span className="text-blue-400">IT-Аутсорсинга</span>
+            </h1>
+            <p className="text-base sm:text-xl md:text-2xl mb-6 sm:mb-8 text-gray-300">
+              Превращаем идеи в инновационные цифровые решения. Разработка, консалтинг, поддержка — полный цикл услуг для вашего бизнеса.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-3 sm:gap-4 w-full max-w-xs mx-auto md:max-w-none md:mx-0">
+              <a href="#contact" className="bg-blue-600 text-white font-bold py-3 px-6 sm:px-8 rounded-full hover:bg-blue-700 transition shadow-lg text-center">Обсудить проект</a>
+              <a href="#services" className="bg-transparent border border-blue-600 text-blue-400 font-bold py-3 px-6 sm:px-8 rounded-full hover:bg-blue-900 hover:bg-opacity-30 transition text-center">Наши услуги</a>
+            </div>
           </div>
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-4 sm:mb-6">
-            Ваш Надежный Партнер в Мире <span className="text-blue-400">IT-Аутсорсинга</span>
-          </h1>
-          <p className="text-base sm:text-xl md:text-2xl mb-6 sm:mb-8 text-gray-300">
-            Превращаем идеи в инновационные цифровые решения. Разработка, консалтинг, поддержка — полный цикл услуг для вашего бизнеса.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-3 sm:gap-4 w-full max-w-xs mx-auto md:max-w-none md:mx-0">
-            <a href="#contact" className="bg-blue-600 text-white font-bold py-3 px-6 sm:px-8 rounded-full hover:bg-blue-700 transition shadow-lg text-center">Обсудить проект</a>
-            <a href="#services" className="bg-transparent border border-blue-600 text-blue-400 font-bold py-3 px-6 sm:px-8 rounded-full hover:bg-blue-900 hover:bg-opacity-30 transition text-center">Наши услуги</a>
+          <div className="w-full md:w-1/2 flex justify-center">
+            <img src="https://placehold.co/400x240/1E3A8A/FFFFFF?text=AstrikS+Team" alt="AstrikS Team" className="rounded-lg shadow-2xl w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl h-auto object-cover" />
           </div>
-        </div>
-        <div className="w-full md:w-1/2 flex justify-center">
-          <img src="https://placehold.co/400x240/1E3A8A/FFFFFF?text=AstrikS+Team" alt="AstrikS Team" className="rounded-lg shadow-2xl w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl h-auto object-cover" />
         </div>
       </div>
     </section>
@@ -312,6 +345,107 @@ function Portfolio() {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Investors() {
+  const investorProjects = [
+    {
+      title: 'AI-платформа для персонализированного обучения "EduMind"',
+      description: 'Инновационная платформа на базе ИИ, адаптирующая учебные материалы под индивидуальные потребности каждого студента.',
+      image: 'https://placehold.co/400x250/1E3A8A/FFFFFF?text=EduMind+AI',
+      fundingGoal: '500 000 USD',
+      roi: 'Прогнозируемый ROI: 300% за 3 года',
+      status: 'Ищем инвестиции',
+      tags: ['AI/ML', 'Образование', 'SaaS', 'Стартап']
+    },
+    {
+      title: 'Платформа для удаленного мониторинга здоровья "HealthConnect"',
+      description: 'Мобильное и веб-приложение для дистанционного контроля показателей здоровья пациентов с хроническими заболеваниями.',
+      image: 'https://placehold.co/400x250/1E3A8A/FFFFFF?text=HealthConnect',
+      fundingGoal: '750 000 USD',
+      roi: 'Прогнозируемый ROI: 250% за 4 года',
+      status: 'Ищем инвестиции',
+      tags: ['Здравоохранение', 'Мобильная разработка', 'IoT', 'Облака']
+    },
+    {
+      title: 'Экосистема для управления городской инфраструктурой "SmartCity OS"',
+      description: 'Комплексная облачная платформа для оптимизации управления городскими ресурсами: транспортом, энергетикой, отходами.',
+      image: 'https://placehold.co/400x250/1E3A8A/FFFFFF?text=SmartCity+OS',
+      fundingGoal: '1 200 000 USD',
+      roi: 'Прогнозируемый ROI: 400% за 5 лет',
+      status: 'Ищем инвестиции',
+      tags: ['Smart City', 'Облачные решения', 'Big Data', 'Правительство']
+    },
+    {
+      title: 'VR-тренажер для хирургов "MediSim VR"',
+      description: 'Виртуальная реальность для обучения и повышения квалификации хирургов. Реалистичные симуляции операций без риска для пациентов.',
+      image: 'https://placehold.co/400x250/1E3A8A/FFFFFF?text=MediSim+VR',
+      fundingGoal: '900 000 USD',
+      roi: 'Прогнозируемый ROI: 350% за 3.5 года',
+      status: 'Ищем инвестиции',
+      tags: ['VR/AR', 'Здравоохранение', 'Образование', 'Симуляции']
+    }
+  ];
+  return (
+    <section id="investors" className="py-10 sm:py-16 bg-gray-800">
+      <div className="container mx-auto px-2 sm:px-4 text-center">
+        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400 flex items-center justify-center gap-2"><Briefcase className="w-7 h-7 text-green-400" />Для инвесторов</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+          {investorProjects.map((project, index) => (
+            <div key={index} className="bg-gray-900 rounded-lg shadow-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300 transform hover:scale-105 flex flex-col">
+              <img src={project.image} alt={project.title} className="w-full h-56 object-cover" />
+              <div className="p-6 text-left flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-semibold mb-2 text-white">{project.title}</h3>
+                  <p className="text-gray-400 mb-3 leading-relaxed">{project.description}</p>
+                  <div className="space-y-2 mt-4">
+                    <p className="text-lg font-bold text-blue-400 flex items-center"><DollarSign className="w-5 h-5 mr-2" /> Цель финансирования: {project.fundingGoal}</p>
+                    <p className="text-lg font-bold text-green-400 flex items-center"><TrendingUpIcon className="w-5 h-5 mr-2" /> {project.roi}</p>
+                    <p className="text-lg font-bold text-yellow-400 flex items-center"><Target className="w-5 h-5 mr-2" /> Статус: {project.status}</p>
+                  </div>
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    {project.tags.map((tag, i) => (
+                      <span key={i} className="bg-blue-800 text-blue-200 text-xs font-medium px-2.5 py-0.5 rounded-full">{tag}</span>
+                    ))}
+                  </div>
+                </div>
+                <button className="bg-blue-600 text-white font-bold py-2 px-6 rounded-full hover:bg-blue-700 transition duration-300 ease-in-out shadow-lg mt-8 w-full">Подробнее / Инвестировать</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CompanyHistory() {
+  const milestones = [
+    { year: 2015, title: "Основание компании", desc: "Запуск AstrikS как стартапа в сфере веб-разработки." },
+    { year: 2017, title: "Первые крупные клиенты", desc: "Заключение контрактов с международными компаниями." },
+    { year: 2019, title: "Выход на рынок AI/ML", desc: "Запуск первых проектов с использованием искусственного интеллекта." },
+    { year: 2021, title: "Международное признание", desc: "Получение отраслевых наград и сертификатов." },
+    { year: 2023, title: "Расширение команды и направлений", desc: "Открытие новых офисов и запуск новых сервисов." },
+  ];
+  return (
+    <section id="history" className="py-10 sm:py-16 bg-gray-900">
+      <div className="container mx-auto px-2 sm:px-4 text-center">
+        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400 flex items-center justify-center gap-2"><Star className="w-7 h-7 text-yellow-400" />История компании</h2>
+        <div className="flex flex-col items-center">
+          <ol className="relative border-l-4 border-blue-400">
+            {milestones.map((m, i) => (
+              <li key={i} className="mb-10 ml-6">
+                <div className="absolute w-4 h-4 bg-blue-400 rounded-full mt-1.5 -left-2 border border-white"></div>
+                <span className="text-blue-300 font-bold text-lg">{m.year}</span>
+                <h3 className="text-white text-base font-semibold mb-1">{m.title}</h3>
+                <p className="text-gray-300 text-sm">{m.desc}</p>
+              </li>
+            ))}
+          </ol>
         </div>
       </div>
     </section>
@@ -500,6 +634,8 @@ export default function Home() {
       <Services />
       <Process />
       <Portfolio />
+      <Investors />
+      <CompanyHistory />
       <Team />
       <Blog />
       <CallToAction />
