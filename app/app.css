@@ -13,3 +13,22 @@ body {
     color-scheme: dark;
   }
 }
+
+@media print {
+  header, nav, .scroll-to-top, .bg-gray-800, .bg-gray-900, .bg-blue-700, .bg-blue-800, .bg-blue-900 {
+    display: none !important;
+  }
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  section, main, .container {
+    background: #fff !important;
+    color: #000 !important;
+    box-shadow: none !important;
+  }
+  a {
+    color: #000 !important;
+    text-decoration: underline !important;
+  }
+}

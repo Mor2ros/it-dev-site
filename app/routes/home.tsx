@@ -2,119 +2,101 @@ import React, { useState, useRef, useEffect } from "react";
 import {
   Code, CheckCircle, Star, Handshake, Laptop, Smartphone, Cloud, Menu, X, Zap, Palette, Rocket, MessageSquare, ChevronRight, Brain, GitFork, Lightbulb, Settings, UserPlus, Award, Users, BookOpen, DollarSign, TrendingUp as TrendingUpIcon, Target, ShieldCheck, Briefcase
 } from "lucide-react";
+import toast, { Toaster } from 'react-hot-toast';
 
-const testimonials = [
-  {
-    quote:
-      "AstrikS превзошли все наши ожидания! Их команда разработала для нас невероятно функциональное и интуитивно понятное веб-приложение, которое значительно оптимизировало наши бизнес-процессы.",
-    author: "Анна Смирнова",
-    company: "Генеральный директор, TechInnovate",
-  },
-  {
-    quote:
-      "Мы искали надежного партнера для мобильной разработки, и AstrikS оказались идеальным выбором. Приложение для iOS и Android было создано в срок, с высоким качеством и безупречным UX.",
-    author: "Дмитрий Козлов",
-    company: "Директор по развитию, MobileFuture",
-  },
-  {
-    quote:
-      "Благодаря AstrikS мы успешно мигрировали нашу инфраструктуру в облако. Процесс был гладким, а результаты превзошли ожидания.",
-    author: "Елена Иванова",
-    company: "Руководитель IT-отдела, CloudSolutions",
-  },
-];
+const API_URL = "http://localhost:4000/api";
 
-const navLinks = [
-  { href: "#hero", label: "Главная" },
-  { href: "#services", label: "Услуги" },
-  { href: "#process", label: "Процесс" },
-  { href: "#blog", label: "Блог" },
-  { href: "#testimonials", label: "Отзывы" },
-  { href: "#contact", label: "Контакты" },
-];
+// i18n: все тексты вынесены в объект ru
+const ru = {
+  nav: [
+    { href: "#hero", label: "Главная" },
+    { href: "#services", label: "Услуги" },
+    { href: "#process", label: "Процесс" },
+    { href: "#portfolio", label: "Портфолио" },
+    { href: "#investors", label: "Инвестиции" },
+    { href: "#team", label: "Команда" },
+    { href: "#blog", label: "Блог" },
+    { href: "#testimonials", label: "Отзывы" },
+    { href: "#faq", label: "FAQ" },
+    { href: "#contact", label: "Контакты" },
+  ],
+  hero: {
+    title: (<>
+      Ваш Надежный Партнер в Мире <span className="text-blue-400">IT-Аутсорсинга</span>
+    </>),
+    subtitle: 'Превращаем идеи в инновационные цифровые решения. Разработка, консалтинг, поддержка — полный цикл услуг для вашего бизнеса.',
+    discuss: 'Обсудить проект',
+    services: 'Наши услуги',
+  },
+  whyus: {
+    title: 'Почему выбирают AstrikS?',
+    expertise: 'Глубокая Экспертиза',
+    expertiseDesc: 'Сертифицированные специалисты с опытом в различных областях IT, готовые решать самые сложные задачи.',
+    quality: 'Безупречное Качество',
+    qualityDesc: 'Международные стандарты, лучшие практики (Agile, Scrum), надежность и производительность каждого решения.',
+    partnership: 'Долгосрочное Партнерство',
+    partnershipDesc: 'Строим отношения на доверии, прозрачности и открытой коммуникации для вашего успеха.'
+  },
+  services: {
+    title: 'Наши Ключевые Услуги',
+  },
+  process: {
+    title: 'Наш процесс работы',
+    steps: [
+      { icon: 'Zap', title: '1. Консультация и Анализ', desc: 'Погружаемся в ваши идеи, цели и требования, проводим глубокий анализ.' },
+      { icon: 'Palette', title: '2. Дизайн и Прототипирование', desc: 'Создаем концепции, макеты и интерактивные прототипы для визуализации будущего продукта.' },
+      { icon: 'Code', title: '3. Разработка и Тестирование', desc: 'Пишем чистый код, проводим тщательное тестирование, обеспечивая качество и надежность.' },
+      { icon: 'Rocket', title: '4. Запуск и Поддержка', desc: 'Внедряем решение, оказываем поддержку и обеспечиваем дальнейшее развитие.' },
+    ]
+  },
+  portfolio: {
+    title: 'Портфолио',
+  },
+  investors: {
+    title: 'Инвестиции',
+  },
+  team: {
+    title: 'Наша команда',
+  },
+  blog: {
+    title: 'Последние статьи и инсайты',
+    more: 'Перейти в блог',
+    read: 'Читать далее',
+  },
+  cta: {
+    title: 'Готовы начать свой проект?',
+    subtitle: 'Свяжитесь с нами сегодня, чтобы обсудить ваши идеи и получить бесплатную консультацию.',
+    contact: 'Связаться с нами',
+  },
+  testimonials: {
+    title: 'Отзывы клиентов',
+  },
+  faq: {
+    title: 'FAQ',
+    list: [
+      { q: 'Сколько времени занимает запуск проекта?', a: 'В среднем от 2 до 8 недель в зависимости от сложности и объёма работ. Мы всегда согласуем сроки на старте.' },
+      { q: 'Можно ли заказать только дизайн или только разработку?', a: 'Да, мы гибко подходим к задачам и можем подключиться на любом этапе.' },
+      { q: 'Как происходит поддержка после запуска?', a: 'Мы предлагаем разные пакеты поддержки: от разовых консультаций до круглосуточного SLA.' },
+      { q: 'Работаете ли вы с зарубежными клиентами?', a: 'Да, у нас есть опыт работы с компаниями из Европы, США и Азии.' },
+    ]
+  },
+  contact: {
+    title: 'Связаться с нами',
+    subtitle: 'Оставьте заявку или напишите нам напрямую — мы ответим в ближайшее время!',
+    name: 'Ваше имя (Иван)',
+    email: 'Email (ivan@email.ru)',
+    message: 'Сообщение (например: Хочу обсудить проект)',
+    send: 'Отправить',
+    thanks: 'Спасибо, ваша заявка отправлена!',
+    phone: 'Телефон',
+    emailLabel: 'Email',
+    address: 'Адрес',
+    phoneValue: '+7 (495) 123-45-67',
+    emailValue: 'info@astrikS.ru',
+    addressValue: 'г. Москва, ул. Инновационная, д. 42',
+  }
+};
 
-const services = [
-  {
-    icon: <Laptop className="w-8 h-8 sm:w-10 sm:h-10 text-blue-500 mb-3" />,
-    title: 'Веб-разработка',
-    description: 'Создание адаптивных, высокопроизводительных и безопасных веб-приложений любой сложности, от корпоративных сайтов и порталов до сложных SaaS-платформ и CRM-систем.',
-    details: [
-      'Frontend: React, Angular, Vue.js, Next.js',
-      'Backend: Node.js, Python, Java, .NET, Go',
-      'API и микросервисы',
-      'CMS и e-commerce',
-      'Интеграция сторонних сервисов'
-    ]
-  },
-  {
-    icon: <Smartphone className="w-8 h-8 sm:w-10 sm:h-10 text-blue-500 mb-3" />,
-    title: 'Мобильная разработка',
-    description: 'Разработка интуитивно понятных и функциональных мобильных приложений для iOS и Android, обеспечивающих отличный UX и высокую производительность.',
-    details: [
-      'iOS (Swift, Objective-C)',
-      'Android (Kotlin, Java)',
-      'Кроссплатформенно: React Native, Flutter',
-      'Интеграция с IoT и Bluetooth'
-    ]
-  },
-  {
-    icon: <Cloud className="w-8 h-8 sm:w-10 sm:h-10 text-blue-500 mb-3" />,
-    title: 'Облачные решения',
-    description: 'Миграция, развертывание и оптимизация инфраструктуры в AWS, Azure, GCP. Безопасность, масштабируемость и снижение затрат.',
-    details: [
-      'AWS, Azure, GCP',
-      'Архитектура и стратегия',
-      'FinOps и оптимизация',
-      'Безопасность и соответствие'
-    ]
-  },
-  {
-    icon: <Brain className="w-8 h-8 sm:w-10 sm:h-10 text-pink-500 mb-3" />,
-    title: 'AI и машинное обучение',
-    description: 'Внедрение ИИ и ML для автоматизации, аналитики, прогнозирования и персонализации.',
-    details: [
-      'ML-модели и алгоритмы',
-      'NLP, чат-боты',
-      'Компьютерное зрение',
-      'Рекомендательные системы'
-    ]
-  },
-  {
-    icon: <GitFork className="w-8 h-8 sm:w-10 sm:h-10 text-purple-500 mb-3" />,
-    title: 'DevOps и автоматизация',
-    description: 'Внедрение DevOps, CI/CD, контейнеризация, мониторинг и автоматизация инфраструктуры.',
-    details: [
-      'CI/CD пайплайны',
-      'Docker, Kubernetes',
-      'Terraform, Ansible',
-      'Мониторинг и логирование'
-    ]
-  },
-  {
-    icon: <Lightbulb className="w-8 h-8 sm:w-10 sm:h-10 text-yellow-400 mb-3" />,
-    title: 'IT-консалтинг и аудит',
-    description: 'Стратегический аудит, оптимизация IT-инфраструктуры, безопасность и цифровая трансформация.',
-    details: [
-      'Анализ и ТЗ',
-      'Аудит безопасности',
-      'Оптимизация и масштабирование',
-      'Управление проектами'
-    ]
-  },
-  {
-    icon: <Settings className="w-8 h-8 sm:w-10 sm:h-10 text-gray-400 mb-3" />,
-    title: 'Поддержка и обслуживание',
-    description: 'Техническая поддержка, мониторинг, обновления и масштабирование ваших решений 24/7.',
-    details: [
-      'Техподдержка 24/7',
-      'Мониторинг и обновления',
-      'Инциденты и восстановление',
-      'Масштабирование'
-    ]
-  },
-];
-
-// Fade-in animation hook
 function useFadeInOnView() {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
@@ -123,13 +105,13 @@ function useFadeInOnView() {
     if (!node) return;
     const observer = new window.IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) setVisible(true);
+        if (entry.isIntersecting && !visible) setVisible(true);
       },
       { threshold: 0.15 }
     );
     observer.observe(node);
     return () => observer.disconnect();
-  }, []);
+  }, [visible]);
   return [ref, visible] as const;
 }
 
@@ -147,22 +129,56 @@ function FadeInSection({ children, className = "" }: { children: React.ReactNode
 
 function Header({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
-
+  const [activeSection, setActiveSection] = useState("hero");
+  const sectionIds = ru.nav.map(l => l.href.replace('#', ''));
+  useEffect(() => {
+    const handleScrollSpy = () => {
+      let current = sectionIds[0];
+      for (const id of sectionIds) {
+        const el = document.getElementById(id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= 120) {
+            current = id;
+          }
+        }
+      }
+      setActiveSection(current);
+    };
+    window.addEventListener("scroll", handleScrollSpy, { passive: true });
+    handleScrollSpy();
+    return () => window.removeEventListener("scroll", handleScrollSpy);
+  }, []);
+  function scrollToSection(id: string) {
+    const el = document.getElementById(id.replace('#', ''));
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  }
   return (
     <>
-      <header className="fixed top-0 left-0 w-full bg-gray-950 bg-opacity-95 shadow-lg z-50">
+      <header className="fixed top-0 left-0 w-full bg-gray-950 bg-opacity-95 shadow-lg z-50" role="banner">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center">
             <Code className="text-blue-400 w-8 h-8 mr-2" />
             <span className="text-2xl font-extrabold tracking-tight text-white">AstrikS</span>
           </div>
           {/* Desktop nav */}
-          <nav className="hidden md:flex space-x-6">
-            {navLinks.map((link) => (
+          <nav className="hidden md:flex space-x-6" aria-label="Основная навигация">
+            {ru.nav.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className="text-gray-300 hover:text-blue-400 font-medium transition"
+                onClick={e => {
+                  e.preventDefault();
+                  scrollToSection(link.href);
+                  setMobileOpen(false);
+                }}
+                className={
+                  (activeSection === link.href.replace('#', '')
+                    ? "text-blue-400 font-bold underline underline-offset-8 decoration-2 transition-all duration-300 "
+                    : "text-gray-300 ") +
+                  "hover:text-blue-400 font-medium transition-colors duration-200 px-1 py-0.5 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                }
+                aria-current={activeSection === link.href.replace('#', '') ? "page" : undefined}
               >
                 {link.label}
               </a>
@@ -172,20 +188,32 @@ function Header({ children }: { children: React.ReactNode }) {
           <button
             className="md:hidden text-gray-300 hover:text-blue-400 focus:outline-none"
             onClick={() => setMobileOpen((v) => !v)}
-            aria-label="Открыть меню"
+            aria-label={mobileOpen ? "Закрыть меню" : "Открыть меню"}
+            aria-controls="mobile-menu"
+            aria-expanded={mobileOpen}
           >
             {mobileOpen ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
           </button>
         </div>
         {/* Mobile menu */}
         {mobileOpen && (
-          <nav className="md:hidden bg-gray-900 border-t border-gray-800 shadow-xl animate-fade-in-down">
-            {navLinks.map((link) => (
+          <nav id="mobile-menu" className="md:hidden bg-gray-900 border-t border-gray-800 shadow-xl animate-fade-in-down" aria-label="Мобильное меню">
+            {ru.nav.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className="block px-6 py-4 text-gray-200 hover:bg-gray-800 text-lg border-b border-gray-800"
-                onClick={() => setMobileOpen(false)}
+                onClick={e => {
+                  e.preventDefault();
+                  scrollToSection(link.href);
+                  setMobileOpen(false);
+                }}
+                className={
+                  (activeSection === link.href.replace('#', '')
+                    ? "text-blue-400 font-bold underline underline-offset-8 decoration-2 transition-all duration-300 "
+                    : "text-gray-200 ") +
+                  "block px-6 py-4 hover:bg-gray-800 text-lg border-b border-gray-800 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                }
+                aria-current={activeSection === link.href.replace('#', '') ? "page" : undefined}
               >
                 {link.label}
               </a>
@@ -200,7 +228,7 @@ function Header({ children }: { children: React.ReactNode }) {
 
 function Hero() {
   return (
-    <section id="hero" className="relative bg-gradient-to-r from-blue-900 to-gray-900 text-white py-12 sm:py-16 md:py-24 lg:py-32 overflow-hidden">
+    <section id="hero" className="scroll-mt-20 relative bg-gradient-to-r from-blue-900 to-gray-900 text-white py-12 sm:py-16 md:py-24 lg:py-32 overflow-hidden">
       <div>
         <div className="container mx-auto px-2 sm:px-4 flex flex-col md:flex-row items-center justify-between gap-8 md:gap-0">
           <div className="w-full md:w-1/2 text-center md:text-left mb-8 md:mb-0">
@@ -209,14 +237,14 @@ function Hero() {
               <span className="text-3xl sm:text-4xl font-extrabold tracking-tight">AstrikS</span>
             </div>
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-4 sm:mb-6">
-              Ваш Надежный Партнер в Мире <span className="text-blue-400">IT-Аутсорсинга</span>
+              {ru.hero.title}
             </h1>
             <p className="text-base sm:text-xl md:text-2xl mb-6 sm:mb-8 text-gray-300">
-              Превращаем идеи в инновационные цифровые решения. Разработка, консалтинг, поддержка — полный цикл услуг для вашего бизнеса.
+              {ru.hero.subtitle}
             </p>
             <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-3 sm:gap-4 w-full max-w-xs mx-auto md:max-w-none md:mx-0">
-              <a href="#contact" className="bg-blue-600 text-white font-bold py-3 px-6 sm:px-8 rounded-full hover:bg-blue-700 transition shadow-lg text-center">Обсудить проект</a>
-              <a href="#services" className="bg-transparent border border-blue-600 text-blue-400 font-bold py-3 px-6 sm:px-8 rounded-full hover:bg-blue-900 hover:bg-opacity-30 transition text-center">Наши услуги</a>
+              <a href="#contact" className="bg-blue-600 text-white font-bold py-3 px-6 sm:px-8 rounded-full hover:bg-blue-700 transition shadow-lg text-center">{ru.hero.discuss}</a>
+              <a href="#services" className="bg-transparent border border-blue-600 text-blue-400 font-bold py-3 px-6 sm:px-8 rounded-full hover:bg-blue-900 hover:bg-opacity-30 transition text-center">{ru.hero.services}</a>
             </div>
           </div>
           <div className="w-full md:w-1/2 flex justify-center">
@@ -232,22 +260,22 @@ function WhyUs() {
   return (
     <section id="whyus" className="py-10 sm:py-16 bg-gray-900">
       <div className="container mx-auto px-2 sm:px-4 text-center">
-        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400">Почему выбирают AstrikS?</h2>
+        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400">{ru.whyus.title}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-10">
           <div className="bg-gray-800 p-6 sm:p-8 rounded-lg shadow-xl hover:shadow-2xl transition-transform hover:scale-105">
             <CheckCircle className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 text-green-400" />
-            <h3 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-4 text-white">Глубокая Экспертиза</h3>
-            <p className="text-gray-300 text-sm sm:text-base">Сертифицированные специалисты с опытом в различных областях IT, готовые решать самые сложные задачи.</p>
+            <h3 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-4 text-white">{ru.whyus.expertise}</h3>
+            <p className="text-gray-300 text-sm sm:text-base">{ru.whyus.expertiseDesc}</p>
           </div>
           <div className="bg-gray-800 p-6 sm:p-8 rounded-lg shadow-xl hover:shadow-2xl transition-transform hover:scale-105">
             <Star className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 text-yellow-400" />
-            <h3 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-4 text-white">Безупречное Качество</h3>
-            <p className="text-gray-300 text-sm sm:text-base">Международные стандарты, лучшие практики (Agile, Scrum), надежность и производительность каждого решения.</p>
+            <h3 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-4 text-white">{ru.whyus.quality}</h3>
+            <p className="text-gray-300 text-sm sm:text-base">{ru.whyus.qualityDesc}</p>
           </div>
           <div className="bg-gray-800 p-6 sm:p-8 rounded-lg shadow-xl hover:shadow-2xl transition-transform hover:scale-105">
             <Handshake className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 text-purple-400" />
-            <h3 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-4 text-white">Долгосрочное Партнерство</h3>
-            <p className="text-gray-300 text-sm sm:text-base">Строим отношения на доверии, прозрачности и открытой коммуникации для вашего успеха.</p>
+            <h3 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-4 text-white">{ru.whyus.partnership}</h3>
+            <p className="text-gray-300 text-sm sm:text-base">{ru.whyus.partnershipDesc}</p>
           </div>
         </div>
       </div>
@@ -256,22 +284,70 @@ function WhyUs() {
 }
 
 function Services() {
+  const [services, setServices] = useState<{title: string; description: string; details?: string[]}[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [showCount, setShowCount] = useState(6);
+  useEffect(() => {
+    fetch(`${API_URL}/services`).then(r => r.json()).then(data => { setServices(data); setLoading(false); });
+  }, []);
+  const filtered = services.filter(s =>
+    s.title.toLowerCase().includes(search.toLowerCase()) ||
+    (s.description && s.description.toLowerCase().includes(search.toLowerCase()))
+  );
+  // Иконки для услуг (по порядку)
+  const serviceIcons = [
+    <Code className="w-10 h-10 text-blue-400 mb-2" />,
+    <Cloud className="w-10 h-10 text-cyan-400 mb-2" />,
+    <Smartphone className="w-10 h-10 text-green-400 mb-2" />,
+    <Laptop className="w-10 h-10 text-purple-400 mb-2" />,
+    <Settings className="w-10 h-10 text-yellow-400 mb-2" />,
+    <Rocket className="w-10 h-10 text-pink-400 mb-2" />,
+    <Palette className="w-10 h-10 text-orange-400 mb-2" />,
+    <Brain className="w-10 h-10 text-indigo-400 mb-2" />,
+    <ShieldCheck className="w-10 h-10 text-lime-400 mb-2" />,
+    <UserPlus className="w-10 h-10 text-teal-400 mb-2" />
+  ];
   return (
-    <section id="services" className="py-10 sm:py-16 bg-gray-800">
+    <section id="services" className="scroll-mt-20 py-10 sm:py-16 bg-gray-800">
       <div className="container mx-auto px-2 sm:px-4 text-center">
-        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400">Наши Ключевые Услуги</h2>
+        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400">{ru.services.title}</h2>
+        <input
+          type="text"
+          value={search}
+          onChange={e => { setSearch(e.target.value); setShowCount(6); }}
+          placeholder="Поиск по услугам..."
+          className="mb-6 px-4 py-2 rounded border border-gray-700 bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 w-full max-w-md"
+        />
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
-          {services.map((s, i) => (
-            <div key={i} className="bg-gray-900 p-5 sm:p-6 rounded-lg shadow-lg hover:shadow-xl flex flex-col items-center">
-              {s.icon}
-              <h3 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2 text-white">{s.title}</h3>
-              <p className="text-gray-400 text-sm sm:text-base mb-2">{s.description}</p>
-              <ul className="text-gray-400 text-xs sm:text-sm text-left list-disc pl-5 mb-2">
-                {s.details.map((d, j) => <li key={j}>{d}</li>)}
-              </ul>
-            </div>
-          ))}
+          {loading
+            ? Array.from({length: 6}).map((_, i) => (
+                <div key={i} className="bg-gray-900 p-5 sm:p-6 rounded-lg shadow-lg animate-pulse flex flex-col items-center">
+                  <div className="w-10 h-10 bg-gray-700 rounded-full mb-2" />
+                  <div className="h-5 w-2/3 bg-gray-700 rounded mb-2" />
+                  <div className="h-4 w-full bg-gray-700 rounded mb-2" />
+                  <div className="h-3 w-1/2 bg-gray-700 rounded" />
+                </div>
+              ))
+            : filtered.slice(0, showCount).map((s, i) => (
+                <div key={i} className="bg-gray-900 p-5 sm:p-6 rounded-lg shadow-lg hover:shadow-xl flex flex-col items-center">
+                  <div>{serviceIcons[i % serviceIcons.length]}</div>
+                  <h3 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2 text-white">{s.title}</h3>
+                  <p className="text-gray-400 text-sm sm:text-base mb-2">{s.description}</p>
+                  {s.details && Array.isArray(s.details) && (
+                    <ul className="text-gray-400 text-xs sm:text-sm text-left list-disc pl-5 mb-2">
+                      {s.details.map((d: string, j: number) => <li key={j}>{d}</li>)}
+                    </ul>
+                  )}
+                </div>
+              ))}
         </div>
+        {filtered.length > showCount && (
+          <button
+            onClick={() => setShowCount(c => c + 6)}
+            className="mt-6 bg-blue-600 text-white font-bold py-2 px-8 rounded-full hover:bg-blue-700 transition shadow-lg transform active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-300"
+          >Показать ещё</button>
+        )}
       </div>
     </section>
   );
@@ -279,30 +355,19 @@ function Services() {
 
 function Process() {
   return (
-    <section id="process" className="py-10 sm:py-16 bg-gray-900">
+    <section id="process" className="scroll-mt-20 py-10 sm:py-16 bg-gray-900">
       <div className="container mx-auto px-2 sm:px-4 text-center">
-        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400">Наш процесс работы</h2>
+        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400">{ru.process.title}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
-          <div className="flex flex-col items-center">
-            <Zap className="w-12 h-12 sm:w-16 sm:h-16 text-yellow-400 mb-3" />
-            <h3 className="text-lg sm:text-xl font-semibold mb-2 text-white">1. Консультация и Анализ</h3>
-            <p className="text-gray-400 text-xs sm:text-sm">Погружаемся в ваши идеи, цели и требования, проводим глубокий анализ.</p>
-          </div>
-          <div className="flex flex-col items-center">
-            <Palette className="w-12 h-12 sm:w-16 sm:h-16 text-pink-400 mb-3" />
-            <h3 className="text-lg sm:text-xl font-semibold mb-2 text-white">2. Дизайн и Прототипирование</h3>
-            <p className="text-gray-400 text-xs sm:text-sm">Создаем концепции, макеты и интерактивные прототипы для визуализации будущего продукта.</p>
-          </div>
-          <div className="flex flex-col items-center">
-            <Code className="w-12 h-12 sm:w-16 sm:h-16 text-blue-400 mb-3" />
-            <h3 className="text-lg sm:text-xl font-semibold mb-2 text-white">3. Разработка и Тестирование</h3>
-            <p className="text-gray-400 text-xs sm:text-sm">Пишем чистый код, проводим тщательное тестирование, обеспечивая качество и надежность.</p>
-          </div>
-          <div className="flex flex-col items-center">
-            <Rocket className="w-12 h-12 sm:w-16 sm:h-16 text-green-400 mb-3" />
-            <h3 className="text-lg sm:text-xl font-semibold mb-2 text-white">4. Запуск и Поддержка</h3>
-            <p className="text-gray-400 text-xs sm:text-sm">Внедряем решение, оказываем поддержку и обеспечиваем дальнейшее развитие.</p>
-          </div>
+          {ru.process.steps.map((step, i) => (
+            <div key={i} className="flex flex-col items-center">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 text-yellow-400 mb-3">
+                <Zap className="w-12 h-12 sm:w-16 sm:h-16" />
+              </div>
+              <h3 className="text-lg sm:text-xl font-semibold mb-2 text-white">{step.title}</h3>
+              <p className="text-gray-400 text-xs sm:text-sm">{step.desc}</p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -330,12 +395,39 @@ function Portfolio() {
       tags: ['Python', 'NLP', 'AI', 'Chatbot']
     },
   ];
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const allTags = Array.from(new Set(projects.flatMap(p => p.tags)));
+  const filtered = selectedTags.length === 0
+    ? projects
+    : projects.filter(p => selectedTags.every(tag => p.tags.includes(tag)));
+  function toggleTag(tag: string) {
+    setSelectedTags(tags => tags.includes(tag)
+      ? tags.filter(t => t !== tag)
+      : [...tags, tag]);
+  }
   return (
-    <section id="portfolio" className="py-10 sm:py-16 bg-gray-900">
+    <section id="portfolio" className="scroll-mt-20 py-10 sm:py-16 bg-gray-900">
       <div className="container mx-auto px-2 sm:px-4 text-center">
-        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400 flex items-center justify-center gap-2"><Award className="w-7 h-7 text-yellow-400" />Портфолио</h2>
+        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400 flex items-center justify-center gap-2"><Award className="w-7 h-7 text-yellow-400" />{ru.portfolio.title}</h2>
+        <div className="mb-8 flex flex-wrap justify-center gap-2">
+          {allTags.map(tag => (
+            <button
+              key={tag}
+              onClick={() => toggleTag(tag)}
+              className={
+                (selectedTags.includes(tag)
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-800 text-blue-200 hover:bg-blue-800') +
+                ' px-3 py-1 rounded-full text-xs font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-400'
+              }
+              type="button"
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-          {projects.map((p, i) => (
+          {filtered.map((p, i) => (
             <div key={i} className="bg-gray-800 rounded-lg shadow-xl hover:shadow-2xl p-5 flex flex-col items-center">
               <img src={p.image} alt={p.title} className="rounded-md mb-4 w-full h-40 object-cover" />
               <h3 className="text-lg sm:text-xl font-semibold mb-2 text-white">{p.title}</h3>
@@ -346,6 +438,9 @@ function Portfolio() {
             </div>
           ))}
         </div>
+        {filtered.length === 0 && (
+          <div className="text-gray-400 mt-8">Нет проектов с выбранными тегами.</div>
+        )}
       </div>
     </section>
   );
@@ -391,9 +486,9 @@ function Investors() {
     }
   ];
   return (
-    <section id="investors" className="py-10 sm:py-16 bg-gray-800">
+    <section id="investors" className="scroll-mt-20 py-10 sm:py-16 bg-gray-800">
       <div className="container mx-auto px-2 sm:px-4 text-center">
-        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400 flex items-center justify-center gap-2"><Briefcase className="w-7 h-7 text-green-400" />Для инвесторов</h2>
+        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400 flex items-center justify-center gap-2"><Briefcase className="w-7 h-7 text-green-400" />{ru.investors.title}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
           {investorProjects.map((project, index) => (
             <div key={index} className="bg-gray-900 rounded-lg shadow-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300 transform hover:scale-105 flex flex-col">
@@ -423,105 +518,74 @@ function Investors() {
   );
 }
 
-function CompanyHistory() {
-  const milestones = [
-    { year: 2015, title: "Основание компании", desc: "Запуск AstrikS как стартапа в сфере веб-разработки." },
-    { year: 2017, title: "Первые крупные клиенты", desc: "Заключение контрактов с международными компаниями." },
-    { year: 2019, title: "Выход на рынок AI/ML", desc: "Запуск первых проектов с использованием искусственного интеллекта." },
-    { year: 2021, title: "Международное признание", desc: "Получение отраслевых наград и сертификатов." },
-    { year: 2023, title: "Расширение команды и направлений", desc: "Открытие новых офисов и запуск новых сервисов." },
-  ];
-  return (
-    <section id="history" className="py-10 sm:py-16 bg-gray-900">
-      <div className="container mx-auto px-2 sm:px-4 text-center">
-        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400 flex items-center justify-center gap-2"><Star className="w-7 h-7 text-yellow-400" />История компании</h2>
-        <div className="flex flex-col items-center">
-          <ol className="relative border-l-4 border-blue-400">
-            {milestones.map((m, i) => (
-              <li key={i} className="mb-10 ml-6">
-                <div className="absolute w-4 h-4 bg-blue-400 rounded-full mt-1.5 -left-2 border border-white"></div>
-                <span className="text-blue-300 font-bold text-lg">{m.year}</span>
-                <h3 className="text-white text-base font-semibold mb-1">{m.title}</h3>
-                <p className="text-gray-300 text-sm">{m.desc}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function Team() {
-  const members = [
-    {
-      name: 'Алексей Иванов',
-      role: 'CEO & Tech Lead',
-      photo: 'https://placehold.co/160x160/1E3A8A/FFFFFF?text=AI',
-      bio: '15+ лет в IT, эксперт по архитектуре и развитию команд.'
-    },
-    {
-      name: 'Мария Смирнова',
-      role: 'UX/UI Designer',
-      photo: 'https://placehold.co/160x160/1E3A8A/FFFFFF?text=MS',
-      bio: 'Создаёт удобные интерфейсы и визуальные концепции.'
-    },
-    {
-      name: 'Игорь Козлов',
-      role: 'Fullstack Developer',
-      photo: 'https://placehold.co/160x160/1E3A8A/FFFFFF?text=IK',
-      bio: 'Специалист по современным веб-технологиям и DevOps.'
-    },
-    {
-      name: 'Елена Петрова',
-      role: 'Project Manager',
-      photo: 'https://placehold.co/160x160/1E3A8A/FFFFFF?text=EP',
-      bio: 'Организует процессы и коммуникацию с клиентами.'
-    },
-  ];
+  const [team, setTeam] = useState<{name: string; role: string; bio?: string; photo?: string}[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [showCount, setShowCount] = useState(8);
+  useEffect(() => {
+    fetch(`${API_URL}/team`).then(r => r.json()).then(data => { setTeam(data); setLoading(false); });
+  }, []);
+  function getInitials(name: string) {
+    const parts = name.trim().split(' ');
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + (parts[1]?.[0] || '')).toUpperCase();
+  }
+  const filtered = team.filter(m =>
+    m.name.toLowerCase().includes(search.toLowerCase()) ||
+    (m.role && m.role.toLowerCase().includes(search.toLowerCase()))
+  );
   return (
-    <section id="team" className="py-10 sm:py-16 bg-gray-800">
+    <section id="team" className="scroll-mt-20 py-10 sm:py-16 bg-gray-800">
       <div className="container mx-auto px-2 sm:px-4 text-center">
-        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400 flex items-center justify-center gap-2"><Users className="w-7 h-7 text-blue-300" />Наша команда</h2>
+        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400 flex items-center justify-center gap-2"><Users className="w-7 h-7 text-blue-300" />{ru.team.title}</h2>
+        <input
+          type="text"
+          value={search}
+          onChange={e => { setSearch(e.target.value); setShowCount(8); }}
+          placeholder="Поиск по команде..."
+          className="mb-6 px-4 py-2 rounded border border-gray-700 bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 w-full max-w-md"
+        />
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
-          {members.map((m, i) => (
-            <div key={i} className="bg-gray-900 rounded-lg shadow-lg p-6 flex flex-col items-center">
-              <img src={m.photo} alt={m.name} className="rounded-full w-24 h-24 mb-4 object-cover border-4 border-blue-700" />
-              <h3 className="text-lg font-semibold text-white mb-1">{m.name}</h3>
-              <div className="text-blue-400 text-sm mb-1">{m.role}</div>
-              <p className="text-gray-400 text-xs mb-2">{m.bio}</p>
-            </div>
-          ))}
+          {loading
+            ? Array.from({length: 4}).map((_, i) => (
+                <div key={i} className="bg-gray-900 rounded-lg shadow-lg p-6 flex flex-col items-center animate-pulse">
+                  <div className="rounded-full w-24 h-24 mb-4 bg-gray-700" />
+                  <div className="h-5 w-2/3 bg-gray-700 rounded mb-2" />
+                  <div className="h-4 w-1/2 bg-gray-700 rounded mb-2" />
+                  <div className="h-3 w-full bg-gray-700 rounded" />
+                </div>
+              ))
+            : filtered.slice(0, showCount).map((m, i) => (
+                <div key={i} className="bg-gray-900 rounded-lg shadow-lg p-6 flex flex-col items-center">
+                  {m.photo
+                    ? <img src={m.photo} alt={m.name} className="rounded-full w-24 h-24 mb-4 object-cover border-4 border-blue-700" />
+                    : <div className="rounded-full w-24 h-24 mb-4 flex items-center justify-center bg-blue-800 text-white text-3xl font-bold border-4 border-blue-700 select-none">{getInitials(m.name)}</div>
+                  }
+                  <h3 className="text-lg font-semibold text-white mb-1">{m.name}</h3>
+                  <div className="text-blue-400 text-sm mb-1">{m.role}</div>
+                  {m.bio && <p className="text-gray-400 text-xs mb-2">{m.bio}</p>}
+                </div>
+              ))}
         </div>
+        {filtered.length > showCount && (
+          <button
+            onClick={() => setShowCount(c => c + 8)}
+            className="mt-6 bg-blue-600 text-white font-bold py-2 px-8 rounded-full hover:bg-blue-700 transition shadow-lg transform active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-300"
+          >Показать ещё</button>
+        )}
       </div>
     </section>
   );
 }
 
 function FAQ() {
-  const faqs = [
-    {
-      q: 'Сколько времени занимает запуск проекта?',
-      a: 'В среднем от 2 до 8 недель в зависимости от сложности и объёма работ. Мы всегда согласуем сроки на старте.'
-    },
-    {
-      q: 'Можно ли заказать только дизайн или только разработку?',
-      a: 'Да, мы гибко подходим к задачам и можем подключиться на любом этапе.'
-    },
-    {
-      q: 'Как происходит поддержка после запуска?',
-      a: 'Мы предлагаем разные пакеты поддержки: от разовых консультаций до круглосуточного SLA.'
-    },
-    {
-      q: 'Работаете ли вы с зарубежными клиентами?',
-      a: 'Да, у нас есть опыт работы с компаниями из Европы, США и Азии.'
-    },
-  ];
+  const faqs = ru.faq.list;
   const [open, setOpen] = useState<number | null>(null);
   return (
-    <section id="faq" className="py-10 sm:py-16 bg-gray-900">
+    <section id="faq" className="scroll-mt-20 py-10 sm:py-16 bg-gray-900">
       <div className="container mx-auto px-2 sm:px-4 max-w-2xl">
-        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400 flex items-center gap-2"><BookOpen className="w-7 h-7 text-blue-200" />FAQ</h2>
+        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400 flex items-center gap-2"><BookOpen className="w-7 h-7 text-blue-200" />{ru.faq.title}</h2>
         <div className="space-y-4">
           {faqs.map((f, i) => (
             <div key={i} className="bg-gray-800 rounded-lg shadow p-4">
@@ -529,11 +593,14 @@ function FAQ() {
                 className="w-full text-left flex justify-between items-center text-white font-semibold text-base sm:text-lg focus:outline-none"
                 onClick={() => setOpen(open === i ? null : i)}
                 aria-expanded={open === i}
+                aria-controls={`faq-panel-${i}`}
+                id={`faq-button-${i}`}
               >
                 {f.q}
                 <span className="ml-2 text-blue-400">{open === i ? '-' : '+'}</span>
               </button>
-              {open === i && <div className="mt-2 text-gray-300 text-sm sm:text-base">{f.a}</div>}
+              {open === i && <div id={`faq-panel-${i}`} role="region" aria-labelledby={`faq-button-${i}`}
+                className="mt-2 text-gray-300 text-sm sm:text-base">{f.a}</div>}
             </div>
           ))}
         </div>
@@ -544,30 +611,30 @@ function FAQ() {
 
 function Blog() {
   return (
-    <section id="blog" className="py-10 sm:py-16 bg-gray-900">
+    <section id="blog" className="scroll-mt-20 py-10 sm:py-16 bg-gray-900">
       <div className="container mx-auto px-2 sm:px-4 text-center">
-        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400">Последние статьи и инсайты</h2>
+        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400">{ru.blog.title}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
           <div className="bg-gray-800 p-5 sm:p-6 rounded-lg shadow-xl hover:shadow-2xl flex flex-col items-center">
             <img src="https://placehold.co/300x200/2C3E50/FFFFFF?text=AI+Trends" alt="AI Trends" className="rounded-md mb-4 w-full h-40 object-cover" />
             <h3 className="text-lg sm:text-xl font-semibold mb-2 text-white">Будущее AI в бизнесе: что нужно знать</h3>
             <p className="text-gray-400 text-xs sm:text-sm mb-4">Как искусственный интеллект меняет бизнес и какие возможности он открывает.</p>
-            <a href="#blog" className="text-blue-400 hover:underline text-sm flex items-center">Читать далее <ChevronRight className="inline-block w-4 h-4 ml-1" /></a>
+            <a href="#blog" className="text-blue-400 hover:underline text-sm flex items-center">{ru.blog.read} <ChevronRight className="inline-block w-4 h-4 ml-1" /></a>
           </div>
           <div className="bg-gray-800 p-5 sm:p-6 rounded-lg shadow-xl hover:shadow-2xl flex flex-col items-center">
             <img src="https://placehold.co/300x200/2C3E50/FFFFFF?text=Cloud+Security" alt="Cloud Security" className="rounded-md mb-4 w-full h-40 object-cover" />
             <h3 className="text-lg sm:text-xl font-semibold mb-2 text-white">Облачная безопасность: лучшие практики</h3>
             <p className="text-gray-400 text-xs sm:text-sm mb-4">Обеспечение безопасности данных в облаке — критически важная задача. Мы делимся проверенными методами.</p>
-            <a href="#blog" className="text-blue-400 hover:underline text-sm flex items-center">Читать далее <ChevronRight className="inline-block w-4 h-4 ml-1" /></a>
+            <a href="#blog" className="text-blue-400 hover:underline text-sm flex items-center">{ru.blog.read} <ChevronRight className="inline-block w-4 h-4 ml-1" /></a>
           </div>
           <div className="bg-gray-800 p-5 sm:p-6 rounded-lg shadow-xl hover:shadow-2xl flex flex-col items-center">
             <img src="https://placehold.co/300x200/2C3E50/FFFFFF?text=DevOps+Benefits" alt="DevOps Benefits" className="rounded-md mb-4 w-full h-40 object-cover" />
             <h3 className="text-lg sm:text-xl font-semibold mb-2 text-white">DevOps для стартапов: ускорение роста</h3>
             <p className="text-gray-400 text-xs sm:text-sm mb-4">Как внедрение DevOps-практик помогает стартапам быстро масштабироваться и выпускать продукты.</p>
-            <a href="#blog" className="text-blue-400 hover:underline text-sm flex items-center">Читать далее <ChevronRight className="inline-block w-4 h-4 ml-1" /></a>
+            <a href="#blog" className="text-blue-400 hover:underline text-sm flex items-center">{ru.blog.read} <ChevronRight className="inline-block w-4 h-4 ml-1" /></a>
           </div>
         </div>
-        <a href="#blog" className="inline-block bg-transparent border border-gray-600 text-gray-300 font-bold py-3 px-8 rounded-full hover:bg-gray-700 hover:bg-opacity-30 transition duration-300 ease-in-out shadow-lg transform hover:scale-105 mt-8">Перейти в блог</a>
+        <a href="#blog" className="inline-block bg-transparent border border-gray-600 text-gray-300 font-bold py-3 px-8 rounded-full hover:bg-gray-700 hover:bg-opacity-30 transition duration-300 ease-in-out shadow-lg transform hover:scale-105 mt-8">{ru.blog.more}</a>
       </div>
     </section>
   );
@@ -577,71 +644,188 @@ function CallToAction() {
   return (
     <section className="bg-blue-700 text-white py-10 sm:py-16 text-center">
       <div className="container mx-auto px-4">
-        <h2 className="text-2xl sm:text-4xl font-bold mb-4 sm:mb-6">Готовы начать свой проект?</h2>
-        <p className="text-base sm:text-xl mb-6 sm:mb-8">Свяжитесь с нами сегодня, чтобы обсудить ваши идеи и получить бесплатную консультацию.</p>
-        <a href="#contact" className="bg-white text-blue-700 font-bold py-3 px-8 rounded-full hover:bg-gray-200 transition shadow-lg inline-block">Связаться с нами</a>
+        <h2 className="text-2xl sm:text-4xl font-bold mb-4 sm:mb-6">{ru.cta.title}</h2>
+        <p className="text-base sm:text-xl mb-6 sm:mb-8">{ru.cta.subtitle}</p>
+        <a href="#contact" className="bg-white text-blue-700 font-bold py-3 px-8 rounded-full hover:bg-gray-200 transition shadow-lg inline-block">{ru.cta.contact}</a>
       </div>
     </section>
   );
 }
 
 function Testimonials() {
+  const [testimonials, setTestimonials] = useState<{quote: string; author: string; company: string; photo?: string}[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showCount, setShowCount] = useState(6);
+  useEffect(() => {
+    fetch(`${API_URL}/testimonials`).then(r => r.json()).then(data => { setTestimonials(data); setLoading(false); });
+  }, []);
   return (
-    <section id="testimonials" className="py-10 sm:py-16 bg-gray-900">
+    <section id="testimonials" className="scroll-mt-20 py-10 sm:py-16 bg-gray-900">
       <div className="container mx-auto px-2 sm:px-4">
-        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400 text-center">Отзывы клиентов</h2>
+        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400 text-center">{ru.testimonials.title}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
-          {testimonials.map((t, i) => (
-            <div key={i} className="bg-gray-800 p-5 sm:p-6 rounded-lg shadow-lg">
-              <p className="text-base sm:text-lg text-gray-200 mb-3 sm:mb-4">“{t.quote}”</p>
-              <div className="text-blue-400 font-semibold">{t.author}</div>
-              <div className="text-gray-400 text-xs sm:text-sm">{t.company}</div>
-            </div>
-          ))}
+          {loading
+            ? Array.from({length: 3}).map((_, i) => (
+                <div key={i} className="bg-gray-800 p-5 sm:p-6 rounded-lg shadow-lg animate-pulse">
+                  <div className="rounded-full bg-gray-700 w-10 h-10 mb-3" />
+                  <div className="h-5 w-2/3 bg-gray-700 rounded mb-2" />
+                  <div className="h-4 w-1/2 bg-gray-700 rounded mb-2" />
+                  <div className="h-3 w-full bg-gray-700 rounded" />
+                </div>
+              ))
+            : testimonials.slice(0, showCount).map((t, i) => (
+                <div key={i} className="bg-gray-800 p-5 sm:p-6 rounded-lg shadow-lg">
+                  <div className="flex items-center mb-3">
+                    {t.photo
+                      ? <img src={t.photo} alt={t.author} className="rounded-full w-10 h-10 mr-3 object-cover border-2 border-blue-700" />
+                      : <div className="rounded-full bg-blue-800 text-white w-10 h-10 flex items-center justify-center font-bold mr-3 text-lg">{t.author ? t.author[0] : '?'}</div>
+                    }
+                    <div>
+                      <div className="font-semibold text-blue-400">{t.author}</div>
+                      <div className="text-xs text-gray-400">{t.company}</div>
+                    </div>
+                  </div>
+                  <p className="text-base sm:text-lg text-gray-200 mb-3 sm:mb-4">"{t.quote}"</p>
+                </div>
+              ))}
         </div>
+        {testimonials.length > showCount && (
+          <button
+            onClick={() => setShowCount(c => c + 6)}
+            className="mt-6 bg-blue-600 text-white font-bold py-2 px-8 rounded-full hover:bg-blue-700 transition shadow-lg transform active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-300"
+          >Показать ещё</button>
+        )}
       </div>
     </section>
   );
 }
 
 function Contact() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [errors, setErrors] = useState<{name?: string; email?: string; message?: string}>({});
+  const [sent, setSent] = useState(false);
+  const nameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const messageRef = useRef<HTMLTextAreaElement>(null);
+
+  function validate() {
+    const errs: typeof errors = {};
+    if (!name.trim()) errs.name = "Введите имя";
+    if (!email.trim()) errs.email = "Введите email";
+    else if (!/^\S+@\S+\.\S+$/.test(email)) errs.email = "Некорректный email";
+    if (!message.trim()) errs.message = "Введите сообщение";
+    return errs;
+  }
+
+  function focusFirstError(errs: typeof errors) {
+    if (errs.name && nameRef.current) {
+      nameRef.current.focus();
+      nameRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else if (errs.email && emailRef.current) {
+      emailRef.current.focus();
+      emailRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else if (errs.message && messageRef.current) {
+      messageRef.current.focus();
+      messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const errs = validate();
+    setErrors(errs);
+    if (Object.keys(errs).length === 0) {
+      setSent(true);
+      setName(""); setEmail(""); setMessage("");
+      toast.success(ru.contact.thanks);
+      setTimeout(() => setSent(false), 5000);
+    } else {
+      toast.error('Проверьте правильность заполнения формы');
+      focusFirstError(errs);
+    }
+  }
+
   return (
-    <section id="contact" className="py-10 sm:py-16 bg-gray-800">
+    <section id="contact" className="scroll-mt-20 py-10 sm:py-16 bg-gray-800">
       <div className="container mx-auto px-2 sm:px-4 max-w-lg sm:max-w-2xl text-center">
-        <h2 className="text-2xl sm:text-4xl font-bold mb-4 sm:mb-6 text-blue-400">Связаться с нами</h2>
-        <p className="mb-6 sm:mb-8 text-gray-300 text-sm sm:text-base">Оставьте заявку или напишите нам напрямую — мы ответим в ближайшее время!</p>
-        <form className="space-y-4 sm:space-y-6">
-          <input type="text" placeholder="Ваше имя" className="w-full px-4 py-3 rounded bg-gray-900 text-white border border-gray-700 focus:border-blue-500 outline-none text-sm sm:text-base" />
-          <input type="email" placeholder="Email" className="w-full px-4 py-3 rounded bg-gray-900 text-white border border-gray-700 focus:border-blue-500 outline-none text-sm sm:text-base" />
-          <textarea placeholder="Сообщение" className="w-full px-4 py-3 rounded bg-gray-900 text-white border border-gray-700 focus:border-blue-500 outline-none text-sm sm:text-base" rows={4}></textarea>
-          <button type="submit" className="bg-blue-600 text-white font-bold py-3 px-8 rounded-full hover:bg-blue-700 transition shadow-lg w-full sm:w-auto">Отправить</button>
+        <h2 className="text-2xl sm:text-4xl font-bold mb-4 sm:mb-6 text-blue-400">{ru.contact.title}</h2>
+        <p className="mb-6 sm:mb-8 text-gray-300 text-sm sm:text-base">{ru.contact.subtitle}</p>
+        <form className="space-y-4 sm:space-y-6" onSubmit={handleSubmit} noValidate aria-label="Форма обратной связи">
+          <div className="text-left">
+            <label htmlFor="contact-name" className="sr-only">{ru.contact.name}</label>
+            <input id="contact-name" ref={nameRef} type="text" placeholder={ru.contact.name} value={name} onChange={e => setName(e.target.value)} className={`w-full px-4 py-3 rounded bg-gray-900 text-white border ${errors.name ? 'border-red-500' : 'border-gray-700'} focus:border-blue-500 outline-none text-sm sm:text-base`} aria-label={ru.contact.name} />
+            {errors.name && <div className="text-red-500 text-xs mt-1" role="alert">{errors.name}</div>}
+          </div>
+          <div className="text-left">
+            <label htmlFor="contact-email" className="sr-only">{ru.contact.emailLabel}</label>
+            <input id="contact-email" ref={emailRef} type="email" placeholder={ru.contact.email} value={email} onChange={e => setEmail(e.target.value)} className={`w-full px-4 py-3 rounded bg-gray-900 text-white border ${errors.email ? 'border-red-500' : 'border-gray-700'} focus:border-blue-500 outline-none text-sm sm:text-base`} aria-label={ru.contact.emailLabel} />
+            {errors.email && <div className="text-red-500 text-xs mt-1" role="alert">{errors.email}</div>}
+          </div>
+          <div className="text-left">
+            <label htmlFor="contact-message" className="sr-only">{ru.contact.message}</label>
+            <textarea id="contact-message" ref={messageRef} placeholder={ru.contact.message} value={message} onChange={e => setMessage(e.target.value)} className={`w-full px-4 py-3 rounded bg-gray-900 text-white border ${errors.message ? 'border-red-500' : 'border-gray-700'} focus:border-blue-500 outline-none text-sm sm:text-base`} rows={4} aria-label={ru.contact.message}></textarea>
+            {errors.message && <div className="text-red-500 text-xs mt-1" role="alert">{errors.message}</div>}
+          </div>
+          <button
+            type="submit"
+            className="bg-blue-600 text-white font-bold py-3 px-8 rounded-full hover:bg-blue-700 transition shadow-lg w-full sm:w-auto transform active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-300"
+            aria-label={ru.contact.send}
+          >
+            {ru.contact.send}
+          </button>
+          {sent && <div className="text-green-400 text-sm mt-2" role="status">{ru.contact.thanks}</div>}
         </form>
         <div className="mt-6 sm:mt-8 text-gray-400 text-xs sm:text-base">
-          <div>Телефон: <a href="tel:+74951234567" className="text-blue-400 hover:underline">+7 (495) 123-45-67</a></div>
-          <div>Email: <a href="mailto:info@astrikS.ru" className="text-blue-400 hover:underline">info@astrikS.ru</a></div>
-          <div>Адрес: г. Москва, ул. Инновационная, д. 42</div>
+          <div>{ru.contact.phone}: <a href="tel:+74951234567" className="text-blue-400 hover:underline">{ru.contact.phoneValue}</a></div>
+          <div>{ru.contact.emailLabel}: <a href="mailto:info@astrikS.ru" className="text-blue-400 hover:underline">{ru.contact.emailValue}</a></div>
+          <div>{ru.contact.address}: {ru.contact.addressValue}</div>
         </div>
       </div>
     </section>
   );
 }
 
+function ScrollToTopButton() {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 300);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  return (
+    <button
+      type="button"
+      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      className={`fixed z-50 bottom-6 right-6 bg-blue-600 text-white rounded-full shadow-lg p-3 transition-transform duration-200 hover:scale-110 focus:outline-none focus:ring-4 focus:ring-blue-300 ${visible ? 'opacity-100' : 'opacity-0 pointer-events-none'} animate-fade-in`}
+      aria-label="Наверх"
+      tabIndex={visible ? 0 : -1}
+    >
+      <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><polyline points="18 15 12 9 6 15"></polyline></svg>
+    </button>
+  );
+}
+
 export default function Home() {
   return (
-    <Header>
-      <Hero />
-      <WhyUs />
-      <Services />
-      <Process />
-      <Portfolio />
-      <Investors />
-      <CompanyHistory />
-      <Team />
-      <Blog />
-      <CallToAction />
-      <Testimonials />
-      <FAQ />
-      <Contact />
-    </Header>
+    <>
+      <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
+      <Header>
+        <FadeInSection><Hero /></FadeInSection>
+        <FadeInSection><WhyUs /></FadeInSection>
+        <FadeInSection><Services /></FadeInSection>
+        <FadeInSection><Process /></FadeInSection>
+        <FadeInSection><Portfolio /></FadeInSection>
+        <FadeInSection><Investors /></FadeInSection>
+        <FadeInSection><Team /></FadeInSection>
+        <FadeInSection><Blog /></FadeInSection>
+        <FadeInSection><CallToAction /></FadeInSection>
+        <FadeInSection><Testimonials /></FadeInSection>
+        <FadeInSection><FAQ /></FadeInSection>
+        <FadeInSection><Contact /></FadeInSection>
+      </Header>
+      <ScrollToTopButton />
+    </>
   );
 }
