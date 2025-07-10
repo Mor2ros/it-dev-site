@@ -77,6 +77,24 @@ npm run build
 
 ## Deployment
 
+### GitHub Pages (Recommended)
+
+The project is configured for automatic deployment to GitHub Pages.
+
+1. **Enable GitHub Pages:**
+   - Go to your repository settings on GitHub
+   - Navigate to "Pages" in the left sidebar
+   - Under "Source", select "GitHub Actions"
+
+2. **Automatic Deployment:**
+   - Every push to the `main` branch will trigger automatic build and deployment
+   - The site will be available at: `https://Mor2ros.github.io/it-dev-site`
+
+3. **Manual Deployment:**
+   ```bash
+   npm run deploy
+   ```
+
 ### Docker Deployment
 
 To build and run using Docker:
