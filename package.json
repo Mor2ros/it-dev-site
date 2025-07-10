@@ -1,9 +1,12 @@
 {
   "name": "it-dev-site",
-  "homepage": "https://Mor2ros.github.io/it-dev-site",
+  "version": "1.0.0",
   "private": true,
+  "homepage": "https://Mor2ros.github.io/it-dev-site",
   "type": "module",
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build/client",
     "build": "react-router build",
     "dev": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
