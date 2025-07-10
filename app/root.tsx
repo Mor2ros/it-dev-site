@@ -10,6 +10,7 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import { LanguageProvider } from "./i18n/LanguageContext";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -24,7 +25,9 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
-export function Layout({ children }: { children: React.ReactNode }) {
+
+
+export default function Root() {
   return (
     <html lang="ru" suppressHydrationWarning>
       <head>
@@ -47,16 +50,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="twitter:image" content="/favicon.ico" />
       </head>
       <body>
-        {children}
+        <LanguageProvider>
+          <Outlet />
+        </LanguageProvider>
         <ScrollRestoration />
         <Scripts />
       </body>
     </html>
   );
-}
-
-export default function Root() {
-  return <Outlet />;
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

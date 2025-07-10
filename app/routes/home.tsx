@@ -1,101 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
-  Code, CheckCircle, Star, Handshake, Laptop, Smartphone, Cloud, Menu, X, Zap, Palette, Rocket, MessageSquare, ChevronRight, Brain, GitFork, Lightbulb, Settings, UserPlus, Award, Users, BookOpen, DollarSign, TrendingUp as TrendingUpIcon, Target, ShieldCheck, Briefcase
+  Code, CheckCircle, Star, Handshake, Laptop, Smartphone, Cloud, Menu, X, Zap, Palette, Rocket, MessageSquare, ChevronRight, Brain, GitFork, Lightbulb, Settings, UserPlus, Award, Users, BookOpen, DollarSign, TrendingUp, Target, ShieldCheck, Briefcase
 } from "lucide-react";
 import toast, { Toaster } from 'react-hot-toast';
+import { useLanguage } from '../i18n/LanguageContext';
+import { LanguageSwitcher } from '../components/LanguageSwitcher';
 
-const API_URL = "http://localhost:4000/api";
-
-// i18n: все тексты вынесены в объект ru
-const ru = {
-  nav: [
-    { href: "#hero", label: "Главная" },
-    { href: "#services", label: "Услуги" },
-    { href: "#process", label: "Процесс" },
-    { href: "#portfolio", label: "Портфолио" },
-    { href: "#investors", label: "Инвестиции" },
-    { href: "#team", label: "Команда" },
-    { href: "#blog", label: "Блог" },
-    { href: "#testimonials", label: "Отзывы" },
-    { href: "#faq", label: "FAQ" },
-    { href: "#contact", label: "Контакты" },
-  ],
-  hero: {
-    title: (<>
-      Ваш Надежный Партнер в Мире <span className="text-blue-400">IT-Аутсорсинга</span>
-    </>),
-    subtitle: 'Превращаем идеи в инновационные цифровые решения. Разработка, консалтинг, поддержка — полный цикл услуг для вашего бизнеса.',
-    discuss: 'Обсудить проект',
-    services: 'Наши услуги',
-  },
-  whyus: {
-    title: 'Почему выбирают AstrikS?',
-    expertise: 'Глубокая Экспертиза',
-    expertiseDesc: 'Сертифицированные специалисты с опытом в различных областях IT, готовые решать самые сложные задачи.',
-    quality: 'Безупречное Качество',
-    qualityDesc: 'Международные стандарты, лучшие практики (Agile, Scrum), надежность и производительность каждого решения.',
-    partnership: 'Долгосрочное Партнерство',
-    partnershipDesc: 'Строим отношения на доверии, прозрачности и открытой коммуникации для вашего успеха.'
-  },
-  services: {
-    title: 'Наши Ключевые Услуги',
-  },
-  process: {
-    title: 'Наш процесс работы',
-    steps: [
-      { icon: 'Zap', title: '1. Консультация и Анализ', desc: 'Погружаемся в ваши идеи, цели и требования, проводим глубокий анализ.' },
-      { icon: 'Palette', title: '2. Дизайн и Прототипирование', desc: 'Создаем концепции, макеты и интерактивные прототипы для визуализации будущего продукта.' },
-      { icon: 'Code', title: '3. Разработка и Тестирование', desc: 'Пишем чистый код, проводим тщательное тестирование, обеспечивая качество и надежность.' },
-      { icon: 'Rocket', title: '4. Запуск и Поддержка', desc: 'Внедряем решение, оказываем поддержку и обеспечиваем дальнейшее развитие.' },
-    ]
-  },
-  portfolio: {
-    title: 'Портфолио',
-  },
-  investors: {
-    title: 'Инвестиции',
-  },
-  team: {
-    title: 'Наша команда',
-  },
-  blog: {
-    title: 'Последние статьи и инсайты',
-    more: 'Перейти в блог',
-    read: 'Читать далее',
-  },
-  cta: {
-    title: 'Готовы начать свой проект?',
-    subtitle: 'Свяжитесь с нами сегодня, чтобы обсудить ваши идеи и получить бесплатную консультацию.',
-    contact: 'Связаться с нами',
-  },
-  testimonials: {
-    title: 'Отзывы клиентов',
-  },
-  faq: {
-    title: 'FAQ',
-    list: [
-      { q: 'Сколько времени занимает запуск проекта?', a: 'В среднем от 2 до 8 недель в зависимости от сложности и объёма работ. Мы всегда согласуем сроки на старте.' },
-      { q: 'Можно ли заказать только дизайн или только разработку?', a: 'Да, мы гибко подходим к задачам и можем подключиться на любом этапе.' },
-      { q: 'Как происходит поддержка после запуска?', a: 'Мы предлагаем разные пакеты поддержки: от разовых консультаций до круглосуточного SLA.' },
-      { q: 'Работаете ли вы с зарубежными клиентами?', a: 'Да, у нас есть опыт работы с компаниями из Европы, США и Азии.' },
-    ]
-  },
-  contact: {
-    title: 'Связаться с нами',
-    subtitle: 'Оставьте заявку или напишите нам напрямую — мы ответим в ближайшее время!',
-    name: 'Ваше имя (Иван)',
-    email: 'Email (ivan@email.ru)',
-    message: 'Сообщение (например: Хочу обсудить проект)',
-    send: 'Отправить',
-    thanks: 'Спасибо, ваша заявка отправлена!',
-    phone: 'Телефон',
-    emailLabel: 'Email',
-    address: 'Адрес',
-    phoneValue: '+7 (495) 123-45-67',
-    emailValue: 'info@astrikS.ru',
-    addressValue: 'г. Москва, ул. Инновационная, д. 42',
-  }
-};
+const API_URL = "/api";
 
 function useFadeInOnView() {
   const ref = useRef(null);
@@ -128,9 +39,10 @@ function FadeInSection({ children, className = "" }: { children: React.ReactNode
 }
 
 function Header({ children }: { children: React.ReactNode }) {
+  const { t } = useLanguage();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
-  const sectionIds = ru.nav.map(l => l.href.replace('#', ''));
+  const sectionIds = t.nav.map(l => l.href.replace('#', ''));
   useEffect(() => {
     const handleScrollSpy = () => {
       let current = sectionIds[0];
@@ -162,8 +74,8 @@ function Header({ children }: { children: React.ReactNode }) {
             <span className="text-2xl font-extrabold tracking-tight text-white">AstrikS</span>
           </div>
           {/* Desktop nav */}
-          <nav className="hidden md:flex space-x-6" aria-label="Основная навигация">
-            {ru.nav.map((link) => (
+          <nav className="hidden md:flex items-center space-x-6" aria-label="Основная навигация">
+            {t.nav.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
@@ -183,6 +95,7 @@ function Header({ children }: { children: React.ReactNode }) {
                 {link.label}
               </a>
             ))}
+            <LanguageSwitcher />
           </nav>
           {/* Mobile burger */}
           <button
@@ -198,7 +111,7 @@ function Header({ children }: { children: React.ReactNode }) {
         {/* Mobile menu */}
         {mobileOpen && (
           <nav id="mobile-menu" className="md:hidden bg-gray-900 border-t border-gray-800 shadow-xl animate-fade-in-down" aria-label="Мобильное меню">
-            {ru.nav.map((link) => (
+            {t.nav.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
@@ -218,6 +131,9 @@ function Header({ children }: { children: React.ReactNode }) {
                 {link.label}
               </a>
             ))}
+            <div className="px-6 py-4 border-t border-gray-800">
+              <LanguageSwitcher />
+            </div>
           </nav>
         )}
       </header>
@@ -227,6 +143,7 @@ function Header({ children }: { children: React.ReactNode }) {
 }
 
 function Hero() {
+  const { t } = useLanguage();
   return (
     <section id="hero" className="scroll-mt-20 relative bg-gradient-to-r from-blue-900 to-gray-900 text-white py-12 sm:py-16 md:py-24 lg:py-32 overflow-hidden">
       <div>
@@ -237,14 +154,15 @@ function Hero() {
               <span className="text-3xl sm:text-4xl font-extrabold tracking-tight">AstrikS</span>
             </div>
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-4 sm:mb-6">
-              {ru.hero.title}
+              {t.hero.title.replace(t.hero.titleHighlight, '')}
+              <span className="text-blue-400">{t.hero.titleHighlight}</span>
             </h1>
             <p className="text-base sm:text-xl md:text-2xl mb-6 sm:mb-8 text-gray-300">
-              {ru.hero.subtitle}
+              {t.hero.subtitle}
             </p>
             <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-3 sm:gap-4 w-full max-w-xs mx-auto md:max-w-none md:mx-0">
-              <a href="#contact" className="bg-blue-600 text-white font-bold py-3 px-6 sm:px-8 rounded-full hover:bg-blue-700 transition shadow-lg text-center">{ru.hero.discuss}</a>
-              <a href="#services" className="bg-transparent border border-blue-600 text-blue-400 font-bold py-3 px-6 sm:px-8 rounded-full hover:bg-blue-900 hover:bg-opacity-30 transition text-center">{ru.hero.services}</a>
+              <a href="#contact" className="bg-blue-600 text-white font-bold py-3 px-6 sm:px-8 rounded-full hover:bg-blue-700 transition shadow-lg text-center">{t.hero.discuss}</a>
+              <a href="#services" className="bg-transparent border border-blue-600 text-blue-400 font-bold py-3 px-6 sm:px-8 rounded-full hover:bg-blue-900 hover:bg-opacity-30 transition text-center">{t.hero.services}</a>
             </div>
           </div>
           <div className="w-full md:w-1/2 flex justify-center">
@@ -257,25 +175,26 @@ function Hero() {
 }
 
 function WhyUs() {
+  const { t } = useLanguage();
   return (
     <section id="whyus" className="py-10 sm:py-16 bg-gray-900">
       <div className="container mx-auto px-2 sm:px-4 text-center">
-        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400">{ru.whyus.title}</h2>
+        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400">{t.whyus.title}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-10">
           <div className="bg-gray-800 p-6 sm:p-8 rounded-lg shadow-xl hover:shadow-2xl transition-transform hover:scale-105">
             <CheckCircle className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 text-green-400" />
-            <h3 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-4 text-white">{ru.whyus.expertise}</h3>
-            <p className="text-gray-300 text-sm sm:text-base">{ru.whyus.expertiseDesc}</p>
+            <h3 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-4 text-white">{t.whyus.expertise}</h3>
+            <p className="text-gray-300 text-sm sm:text-base">{t.whyus.expertiseDesc}</p>
           </div>
           <div className="bg-gray-800 p-6 sm:p-8 rounded-lg shadow-xl hover:shadow-2xl transition-transform hover:scale-105">
             <Star className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 text-yellow-400" />
-            <h3 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-4 text-white">{ru.whyus.quality}</h3>
-            <p className="text-gray-300 text-sm sm:text-base">{ru.whyus.qualityDesc}</p>
+            <h3 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-4 text-white">{t.whyus.quality}</h3>
+            <p className="text-gray-300 text-sm sm:text-base">{t.whyus.qualityDesc}</p>
           </div>
           <div className="bg-gray-800 p-6 sm:p-8 rounded-lg shadow-xl hover:shadow-2xl transition-transform hover:scale-105">
             <Handshake className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 text-purple-400" />
-            <h3 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-4 text-white">{ru.whyus.partnership}</h3>
-            <p className="text-gray-300 text-sm sm:text-base">{ru.whyus.partnershipDesc}</p>
+            <h3 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-4 text-white">{t.whyus.partnership}</h3>
+            <p className="text-gray-300 text-sm sm:text-base">{t.whyus.partnershipDesc}</p>
           </div>
         </div>
       </div>
@@ -284,7 +203,8 @@ function WhyUs() {
 }
 
 function Services() {
-  const [services, setServices] = useState<{title: string; description: string; details?: string[]}[]>([]);
+  const { t } = useLanguage();
+  const [services, setServices] = useState<{title: string; description: string; details?: string[]; icon?: string}[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [showCount, setShowCount] = useState(6);
@@ -295,23 +215,19 @@ function Services() {
     s.title.toLowerCase().includes(search.toLowerCase()) ||
     (s.description && s.description.toLowerCase().includes(search.toLowerCase()))
   );
-  // Иконки для услуг (по порядку)
-  const serviceIcons = [
-    <Code className="w-10 h-10 text-blue-400 mb-2" />,
-    <Cloud className="w-10 h-10 text-cyan-400 mb-2" />,
-    <Smartphone className="w-10 h-10 text-green-400 mb-2" />,
-    <Laptop className="w-10 h-10 text-purple-400 mb-2" />,
-    <Settings className="w-10 h-10 text-yellow-400 mb-2" />,
-    <Rocket className="w-10 h-10 text-pink-400 mb-2" />,
-    <Palette className="w-10 h-10 text-orange-400 mb-2" />,
-    <Brain className="w-10 h-10 text-indigo-400 mb-2" />,
-    <ShieldCheck className="w-10 h-10 text-lime-400 mb-2" />,
-    <UserPlus className="w-10 h-10 text-teal-400 mb-2" />
-  ];
+  // Функция для получения иконки по имени
+  function getServiceIcon(iconName: string) {
+    const iconMap: { [key: string]: React.ComponentType<any> } = {
+      Code, Cloud, Smartphone, Laptop, Settings, Rocket, Palette, Brain, ShieldCheck, UserPlus,
+      Zap, Target, Briefcase, Award, TrendingUp, DollarSign
+    };
+    const IconComponent = iconMap[iconName] || Code;
+    return <IconComponent className="w-10 h-10 text-blue-400 mb-2" />;
+  }
   return (
     <section id="services" className="scroll-mt-20 py-10 sm:py-16 bg-gray-800">
       <div className="container mx-auto px-2 sm:px-4 text-center">
-        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400">{ru.services.title}</h2>
+        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400">{t.services.title}</h2>
         <input
           type="text"
           value={search}
@@ -331,7 +247,7 @@ function Services() {
               ))
             : filtered.slice(0, showCount).map((s, i) => (
                 <div key={i} className="bg-gray-900 p-5 sm:p-6 rounded-lg shadow-lg hover:shadow-xl flex flex-col items-center">
-                  <div>{serviceIcons[i % serviceIcons.length]}</div>
+                  <div>{getServiceIcon(s.icon || 'Code')}</div>
                   <h3 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2 text-white">{s.title}</h3>
                   <p className="text-gray-400 text-sm sm:text-base mb-2">{s.description}</p>
                   {s.details && Array.isArray(s.details) && (
@@ -354,12 +270,13 @@ function Services() {
 }
 
 function Process() {
+  const { t } = useLanguage();
   return (
     <section id="process" className="scroll-mt-20 py-10 sm:py-16 bg-gray-900">
       <div className="container mx-auto px-2 sm:px-4 text-center">
-        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400">{ru.process.title}</h2>
+        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400">{t.process.title}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
-          {ru.process.steps.map((step, i) => (
+          {t.process.steps.map((step, i) => (
             <div key={i} className="flex flex-col items-center">
               <div className="w-12 h-12 sm:w-16 sm:h-16 text-yellow-400 mb-3">
                 <Zap className="w-12 h-12 sm:w-16 sm:h-16" />
@@ -375,6 +292,7 @@ function Process() {
 }
 
 function Portfolio() {
+  const { t } = useLanguage();
   const projects = [
     {
       title: 'Корпоративный портал для FinTech',
@@ -408,7 +326,7 @@ function Portfolio() {
   return (
     <section id="portfolio" className="scroll-mt-20 py-10 sm:py-16 bg-gray-900">
       <div className="container mx-auto px-2 sm:px-4 text-center">
-        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400 flex items-center justify-center gap-2"><Award className="w-7 h-7 text-yellow-400" />{ru.portfolio.title}</h2>
+        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400 flex items-center justify-center gap-2"><Award className="w-7 h-7 text-yellow-400" />{t.portfolio.title}</h2>
         <div className="mb-8 flex flex-wrap justify-center gap-2">
           {allTags.map(tag => (
             <button
@@ -447,6 +365,7 @@ function Portfolio() {
 }
 
 function Investors() {
+  const { t } = useLanguage();
   const investorProjects = [
     {
       title: 'AI-платформа для персонализированного обучения "EduMind"',
@@ -488,7 +407,7 @@ function Investors() {
   return (
     <section id="investors" className="scroll-mt-20 py-10 sm:py-16 bg-gray-800">
       <div className="container mx-auto px-2 sm:px-4 text-center">
-        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400 flex items-center justify-center gap-2"><Briefcase className="w-7 h-7 text-green-400" />{ru.investors.title}</h2>
+        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400 flex items-center justify-center gap-2"><Briefcase className="w-7 h-7 text-green-400" />{t.investors.title}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
           {investorProjects.map((project, index) => (
             <div key={index} className="bg-gray-900 rounded-lg shadow-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300 transform hover:scale-105 flex flex-col">
@@ -499,7 +418,7 @@ function Investors() {
                   <p className="text-gray-400 mb-3 leading-relaxed">{project.description}</p>
                   <div className="space-y-2 mt-4">
                     <p className="text-lg font-bold text-blue-400 flex items-center"><DollarSign className="w-5 h-5 mr-2" /> Цель финансирования: {project.fundingGoal}</p>
-                    <p className="text-lg font-bold text-green-400 flex items-center"><TrendingUpIcon className="w-5 h-5 mr-2" /> {project.roi}</p>
+                    <p className="text-lg font-bold text-green-400 flex items-center"><TrendingUp className="w-5 h-5 mr-2" /> {project.roi}</p>
                     <p className="text-lg font-bold text-yellow-400 flex items-center"><Target className="w-5 h-5 mr-2" /> Статус: {project.status}</p>
                   </div>
                   <div className="flex flex-wrap gap-2 mt-4">
@@ -519,6 +438,7 @@ function Investors() {
 }
 
 function Team() {
+  const { t } = useLanguage();
   const [team, setTeam] = useState<{name: string; role: string; bio?: string; photo?: string}[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -538,7 +458,7 @@ function Team() {
   return (
     <section id="team" className="scroll-mt-20 py-10 sm:py-16 bg-gray-800">
       <div className="container mx-auto px-2 sm:px-4 text-center">
-        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400 flex items-center justify-center gap-2"><Users className="w-7 h-7 text-blue-300" />{ru.team.title}</h2>
+        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400 flex items-center justify-center gap-2"><Users className="w-7 h-7 text-blue-300" />{t.team.title}</h2>
         <input
           type="text"
           value={search}
@@ -580,12 +500,13 @@ function Team() {
 }
 
 function FAQ() {
-  const faqs = ru.faq.list;
+  const { t } = useLanguage();
+  const faqs = t.faq.list;
   const [open, setOpen] = useState<number | null>(null);
   return (
     <section id="faq" className="scroll-mt-20 py-10 sm:py-16 bg-gray-900">
       <div className="container mx-auto px-2 sm:px-4 max-w-2xl">
-        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400 flex items-center gap-2"><BookOpen className="w-7 h-7 text-blue-200" />{ru.faq.title}</h2>
+        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400 flex items-center gap-2"><BookOpen className="w-7 h-7 text-blue-200" />{t.faq.title}</h2>
         <div className="space-y-4">
           {faqs.map((f, i) => (
             <div key={i} className="bg-gray-800 rounded-lg shadow p-4">
@@ -610,49 +531,52 @@ function FAQ() {
 }
 
 function Blog() {
+  const { t } = useLanguage();
   return (
     <section id="blog" className="scroll-mt-20 py-10 sm:py-16 bg-gray-900">
       <div className="container mx-auto px-2 sm:px-4 text-center">
-        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400">{ru.blog.title}</h2>
+        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400">{t.blog.title}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
           <div className="bg-gray-800 p-5 sm:p-6 rounded-lg shadow-xl hover:shadow-2xl flex flex-col items-center">
             <img src="https://placehold.co/300x200/2C3E50/FFFFFF?text=AI+Trends" alt="AI Trends" className="rounded-md mb-4 w-full h-40 object-cover" />
             <h3 className="text-lg sm:text-xl font-semibold mb-2 text-white">Будущее AI в бизнесе: что нужно знать</h3>
             <p className="text-gray-400 text-xs sm:text-sm mb-4">Как искусственный интеллект меняет бизнес и какие возможности он открывает.</p>
-            <a href="#blog" className="text-blue-400 hover:underline text-sm flex items-center">{ru.blog.read} <ChevronRight className="inline-block w-4 h-4 ml-1" /></a>
+            <a href="#blog" className="text-blue-400 hover:underline text-sm flex items-center">{t.blog.read} <ChevronRight className="inline-block w-4 h-4 ml-1" /></a>
           </div>
           <div className="bg-gray-800 p-5 sm:p-6 rounded-lg shadow-xl hover:shadow-2xl flex flex-col items-center">
             <img src="https://placehold.co/300x200/2C3E50/FFFFFF?text=Cloud+Security" alt="Cloud Security" className="rounded-md mb-4 w-full h-40 object-cover" />
             <h3 className="text-lg sm:text-xl font-semibold mb-2 text-white">Облачная безопасность: лучшие практики</h3>
             <p className="text-gray-400 text-xs sm:text-sm mb-4">Обеспечение безопасности данных в облаке — критически важная задача. Мы делимся проверенными методами.</p>
-            <a href="#blog" className="text-blue-400 hover:underline text-sm flex items-center">{ru.blog.read} <ChevronRight className="inline-block w-4 h-4 ml-1" /></a>
+            <a href="#blog" className="text-blue-400 hover:underline text-sm flex items-center">{t.blog.read} <ChevronRight className="inline-block w-4 h-4 ml-1" /></a>
           </div>
           <div className="bg-gray-800 p-5 sm:p-6 rounded-lg shadow-xl hover:shadow-2xl flex flex-col items-center">
             <img src="https://placehold.co/300x200/2C3E50/FFFFFF?text=DevOps+Benefits" alt="DevOps Benefits" className="rounded-md mb-4 w-full h-40 object-cover" />
             <h3 className="text-lg sm:text-xl font-semibold mb-2 text-white">DevOps для стартапов: ускорение роста</h3>
             <p className="text-gray-400 text-xs sm:text-sm mb-4">Как внедрение DevOps-практик помогает стартапам быстро масштабироваться и выпускать продукты.</p>
-            <a href="#blog" className="text-blue-400 hover:underline text-sm flex items-center">{ru.blog.read} <ChevronRight className="inline-block w-4 h-4 ml-1" /></a>
+            <a href="#blog" className="text-blue-400 hover:underline text-sm flex items-center">{t.blog.read} <ChevronRight className="inline-block w-4 h-4 ml-1" /></a>
           </div>
         </div>
-        <a href="#blog" className="inline-block bg-transparent border border-gray-600 text-gray-300 font-bold py-3 px-8 rounded-full hover:bg-gray-700 hover:bg-opacity-30 transition duration-300 ease-in-out shadow-lg transform hover:scale-105 mt-8">{ru.blog.more}</a>
+        <a href="#blog" className="inline-block bg-transparent border border-gray-600 text-gray-300 font-bold py-3 px-8 rounded-full hover:bg-gray-700 hover:bg-opacity-30 transition duration-300 ease-in-out shadow-lg transform hover:scale-105 mt-8">{t.blog.more}</a>
       </div>
     </section>
   );
 }
 
 function CallToAction() {
+  const { t } = useLanguage();
   return (
     <section className="bg-blue-700 text-white py-10 sm:py-16 text-center">
       <div className="container mx-auto px-4">
-        <h2 className="text-2xl sm:text-4xl font-bold mb-4 sm:mb-6">{ru.cta.title}</h2>
-        <p className="text-base sm:text-xl mb-6 sm:mb-8">{ru.cta.subtitle}</p>
-        <a href="#contact" className="bg-white text-blue-700 font-bold py-3 px-8 rounded-full hover:bg-gray-200 transition shadow-lg inline-block">{ru.cta.contact}</a>
+        <h2 className="text-2xl sm:text-4xl font-bold mb-4 sm:mb-6">{t.cta.title}</h2>
+        <p className="text-base sm:text-xl mb-6 sm:mb-8">{t.cta.subtitle}</p>
+        <a href="#contact" className="bg-white text-blue-700 font-bold py-3 px-8 rounded-full hover:bg-gray-200 transition shadow-lg inline-block">{t.cta.contact}</a>
       </div>
     </section>
   );
 }
 
 function Testimonials() {
+  const { t } = useLanguage();
   const [testimonials, setTestimonials] = useState<{quote: string; author: string; company: string; photo?: string}[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCount, setShowCount] = useState(6);
@@ -662,7 +586,7 @@ function Testimonials() {
   return (
     <section id="testimonials" className="scroll-mt-20 py-10 sm:py-16 bg-gray-900">
       <div className="container mx-auto px-2 sm:px-4">
-        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400 text-center">{ru.testimonials.title}</h2>
+        <h2 className="text-2xl sm:text-4xl font-bold mb-8 sm:mb-12 text-blue-400 text-center">{t.testimonials.title}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
           {loading
             ? Array.from({length: 3}).map((_, i) => (
@@ -701,14 +625,19 @@ function Testimonials() {
 }
 
 function Contact() {
+  const { t } = useLanguage();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
-  const [errors, setErrors] = useState<{name?: string; email?: string; message?: string}>({});
+  const [phone, setPhone] = useState("");
+  const [company, setCompany] = useState("");
+  const [errors, setErrors] = useState<{name?: string; email?: string; message?: string; phone?: string}>({});
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
   const nameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const messageRef = useRef<HTMLTextAreaElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
 
   function validate() {
     const errs: typeof errors = {};
@@ -716,6 +645,7 @@ function Contact() {
     if (!email.trim()) errs.email = "Введите email";
     else if (!/^\S+@\S+\.\S+$/.test(email)) errs.email = "Некорректный email";
     if (!message.trim()) errs.message = "Введите сообщение";
+    if (phone.trim() && !/^[\+]?[0-9\s\-\(\)]{10,}$/.test(phone)) errs.phone = "Некорректный номер телефона";
     return errs;
   }
 
@@ -726,21 +656,61 @@ function Contact() {
     } else if (errs.email && emailRef.current) {
       emailRef.current.focus();
       emailRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else if (errs.phone && phoneRef.current) {
+      phoneRef.current.focus();
+      phoneRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     } else if (errs.message && messageRef.current) {
       messageRef.current.focus();
       messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const errs = validate();
     setErrors(errs);
+    
     if (Object.keys(errs).length === 0) {
-      setSent(true);
-      setName(""); setEmail(""); setMessage("");
-      toast.success(ru.contact.thanks);
-      setTimeout(() => setSent(false), 5000);
+      setSending(true);
+      
+      try {
+        const contactData = {
+          name: name.trim(),
+          email: email.trim(),
+          message: message.trim(),
+          phone: phone.trim() || undefined,
+          company: company.trim() || undefined,
+          ip: await fetch('https://api.ipify.org?format=json').then(r => r.json()).then(data => data.ip).catch(() => 'unknown'),
+          userAgent: navigator.userAgent,
+          timestamp: new Date().toISOString()
+        };
+
+        const response = await fetch(`${API_URL}/contacts`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(contactData),
+        });
+
+        if (response.ok) {
+          setSent(true);
+          setName(""); 
+          setEmail(""); 
+          setMessage("");
+          setPhone("");
+          setCompany("");
+          toast.success(t.contact.thanks);
+          setTimeout(() => setSent(false), 5000);
+        } else {
+          throw new Error('Ошибка отправки');
+        }
+      } catch (error) {
+        console.error('Error sending contact form:', error);
+        toast.error('Ошибка отправки. Попробуйте позже или свяжитесь с нами напрямую.');
+      } finally {
+        setSending(false);
+      }
     } else {
       toast.error('Проверьте правильность заполнения формы');
       focusFirstError(errs);
@@ -750,37 +720,122 @@ function Contact() {
   return (
     <section id="contact" className="scroll-mt-20 py-10 sm:py-16 bg-gray-800">
       <div className="container mx-auto px-2 sm:px-4 max-w-lg sm:max-w-2xl text-center">
-        <h2 className="text-2xl sm:text-4xl font-bold mb-4 sm:mb-6 text-blue-400">{ru.contact.title}</h2>
-        <p className="mb-6 sm:mb-8 text-gray-300 text-sm sm:text-base">{ru.contact.subtitle}</p>
+        <h2 className="text-2xl sm:text-4xl font-bold mb-4 sm:mb-6 text-blue-400">{t.contact.title}</h2>
+        <p className="mb-6 sm:mb-8 text-gray-300 text-sm sm:text-base">{t.contact.subtitle}</p>
         <form className="space-y-4 sm:space-y-6" onSubmit={handleSubmit} noValidate aria-label="Форма обратной связи">
-          <div className="text-left">
-            <label htmlFor="contact-name" className="sr-only">{ru.contact.name}</label>
-            <input id="contact-name" ref={nameRef} type="text" placeholder={ru.contact.name} value={name} onChange={e => setName(e.target.value)} className={`w-full px-4 py-3 rounded bg-gray-900 text-white border ${errors.name ? 'border-red-500' : 'border-gray-700'} focus:border-blue-500 outline-none text-sm sm:text-base`} aria-label={ru.contact.name} />
-            {errors.name && <div className="text-red-500 text-xs mt-1" role="alert">{errors.name}</div>}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="text-left">
+              <label htmlFor="contact-name" className="block text-sm font-medium text-gray-300 mb-1">{t.contact.name} *</label>
+              <input 
+                id="contact-name" 
+                ref={nameRef} 
+                type="text" 
+                placeholder={t.contact.name} 
+                value={name} 
+                onChange={e => setName(e.target.value)} 
+                className={`w-full px-4 py-3 rounded bg-gray-900 text-white border ${errors.name ? 'border-red-500' : 'border-gray-700'} focus:border-blue-500 outline-none text-sm sm:text-base transition-colors`} 
+                aria-label={t.contact.name}
+                disabled={sending}
+              />
+              {errors.name && <div className="text-red-500 text-xs mt-1" role="alert">{errors.name}</div>}
+            </div>
+            <div className="text-left">
+              <label htmlFor="contact-email" className="block text-sm font-medium text-gray-300 mb-1">{t.contact.emailLabel} *</label>
+              <input 
+                id="contact-email" 
+                ref={emailRef} 
+                type="email" 
+                placeholder={t.contact.email} 
+                value={email} 
+                onChange={e => setEmail(e.target.value)} 
+                className={`w-full px-4 py-3 rounded bg-gray-900 text-white border ${errors.email ? 'border-red-500' : 'border-gray-700'} focus:border-blue-500 outline-none text-sm sm:text-base transition-colors`} 
+                aria-label={t.contact.emailLabel}
+                disabled={sending}
+              />
+              {errors.email && <div className="text-red-500 text-xs mt-1" role="alert">{errors.email}</div>}
+            </div>
           </div>
-          <div className="text-left">
-            <label htmlFor="contact-email" className="sr-only">{ru.contact.emailLabel}</label>
-            <input id="contact-email" ref={emailRef} type="email" placeholder={ru.contact.email} value={email} onChange={e => setEmail(e.target.value)} className={`w-full px-4 py-3 rounded bg-gray-900 text-white border ${errors.email ? 'border-red-500' : 'border-gray-700'} focus:border-blue-500 outline-none text-sm sm:text-base`} aria-label={ru.contact.emailLabel} />
-            {errors.email && <div className="text-red-500 text-xs mt-1" role="alert">{errors.email}</div>}
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="text-left">
+              <label htmlFor="contact-phone" className="block text-sm font-medium text-gray-300 mb-1">Телефон</label>
+              <input 
+                id="contact-phone" 
+                ref={phoneRef} 
+                type="tel" 
+                placeholder="+7 (999) 123-45-67" 
+                value={phone} 
+                onChange={e => setPhone(e.target.value)} 
+                className={`w-full px-4 py-3 rounded bg-gray-900 text-white border ${errors.phone ? 'border-red-500' : 'border-gray-700'} focus:border-blue-500 outline-none text-sm sm:text-base transition-colors`} 
+                aria-label="Телефон"
+                disabled={sending}
+              />
+              {errors.phone && <div className="text-red-500 text-xs mt-1" role="alert">{errors.phone}</div>}
+            </div>
+            <div className="text-left">
+              <label htmlFor="contact-company" className="block text-sm font-medium text-gray-300 mb-1">Компания</label>
+              <input 
+                id="contact-company" 
+                type="text" 
+                placeholder="Название компании" 
+                value={company} 
+                onChange={e => setCompany(e.target.value)} 
+                className="w-full px-4 py-3 rounded bg-gray-900 text-white border border-gray-700 focus:border-blue-500 outline-none text-sm sm:text-base transition-colors" 
+                aria-label="Компания"
+                disabled={sending}
+              />
+            </div>
           </div>
+          
           <div className="text-left">
-            <label htmlFor="contact-message" className="sr-only">{ru.contact.message}</label>
-            <textarea id="contact-message" ref={messageRef} placeholder={ru.contact.message} value={message} onChange={e => setMessage(e.target.value)} className={`w-full px-4 py-3 rounded bg-gray-900 text-white border ${errors.message ? 'border-red-500' : 'border-gray-700'} focus:border-blue-500 outline-none text-sm sm:text-base`} rows={4} aria-label={ru.contact.message}></textarea>
+            <label htmlFor="contact-message" className="block text-sm font-medium text-gray-300 mb-1">{t.contact.message} *</label>
+            <textarea 
+              id="contact-message" 
+              ref={messageRef} 
+              placeholder={t.contact.message} 
+              value={message} 
+              onChange={e => setMessage(e.target.value)} 
+              className={`w-full px-4 py-3 rounded bg-gray-900 text-white border ${errors.message ? 'border-red-500' : 'border-gray-700'} focus:border-blue-500 outline-none text-sm sm:text-base transition-colors`} 
+              rows={4} 
+              aria-label={t.contact.message}
+              disabled={sending}
+            ></textarea>
             {errors.message && <div className="text-red-500 text-xs mt-1" role="alert">{errors.message}</div>}
           </div>
+          
           <button
             type="submit"
-            className="bg-blue-600 text-white font-bold py-3 px-8 rounded-full hover:bg-blue-700 transition shadow-lg w-full sm:w-auto transform active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-300"
-            aria-label={ru.contact.send}
+            disabled={sending}
+            className={`bg-blue-600 text-white font-bold py-3 px-8 rounded-full transition shadow-lg w-full sm:w-auto transform focus:outline-none focus:ring-4 focus:ring-blue-300 ${
+              sending 
+                ? 'opacity-50 cursor-not-allowed' 
+                : 'hover:bg-blue-700 active:scale-95'
+            }`}
+            aria-label={t.contact.send}
           >
-            {ru.contact.send}
+            {sending ? (
+              <div className="flex items-center justify-center">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Отправка...
+              </div>
+            ) : (
+              t.contact.send
+            )}
           </button>
-          {sent && <div className="text-green-400 text-sm mt-2" role="status">{ru.contact.thanks}</div>}
+          
+          {sent && (
+            <div className="text-green-400 text-sm mt-2 p-3 bg-green-900 bg-opacity-30 rounded-lg border border-green-700" role="status">
+              <div className="flex items-center">
+                <CheckCircle className="w-5 h-5 mr-2" />
+                {t.contact.thanks}
+              </div>
+            </div>
+          )}
         </form>
         <div className="mt-6 sm:mt-8 text-gray-400 text-xs sm:text-base">
-          <div>{ru.contact.phone}: <a href="tel:+74951234567" className="text-blue-400 hover:underline">{ru.contact.phoneValue}</a></div>
-          <div>{ru.contact.emailLabel}: <a href="mailto:info@astrikS.ru" className="text-blue-400 hover:underline">{ru.contact.emailValue}</a></div>
-          <div>{ru.contact.address}: {ru.contact.addressValue}</div>
+          <div>{t.contact.phone}: <a href="tel:+74951234567" className="text-blue-400 hover:underline">{t.contact.phoneValue}</a></div>
+          <div>{t.contact.emailLabel}: <a href="mailto:Teamastriks@gmail.com" className="text-blue-400 hover:underline">{t.contact.emailValue}</a></div>
+          <div>{t.contact.address}: {t.contact.addressValue}</div>
         </div>
       </div>
     </section>
