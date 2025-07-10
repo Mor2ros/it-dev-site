@@ -1,4 +1,4 @@
-# Welcome to React Router!
+# IT-Dev-Site
 
 A modern, production-ready template for building full-stack React applications using React Router.
 
@@ -12,6 +12,10 @@ A modern, production-ready template for building full-stack React applications u
 - 🔄 Data loading and mutations
 - 🔒 TypeScript by default
 - 🎉 TailwindCSS for styling
+- 🌐 Multilanguage (RU/EN)
+- 🛠️ Admin panel for content management
+- 🖼️ Custom icon selection for services
+- 📧 Up-to-date contact email: Teamastriks@gmail.com
 - 📖 [React Router docs](https://reactrouter.com/)
 
 ## Getting Started
@@ -33,6 +37,35 @@ npm run dev
 ```
 
 Your application will be available at `http://localhost:5173`.
+
+## Admin Panel
+
+- Go to `/admin` route to access the admin panel.
+- Default login: `admin` / `admin123`
+- Manage services, testimonials, team, and contacts.
+- For each service, you can select an icon from a visual list.
+- All changes are saved to the SQLite database.
+
+## Customizing Service Icons
+
+- In the admin panel, open the "Услуги" (Services) tab.
+- For each service, click on the icon to select a new one from the available set.
+- The selected icon will be shown on the main page for that service.
+
+## Contact Email
+
+- The contact email at the bottom of the site is now: **Teamastriks@gmail.com**
+- This is reflected in both Russian and English versions.
+
+## Viewing the Database
+
+To view the contents of the SQLite database, run:
+
+```bash
+node view-db.cjs
+```
+
+This will print all services, testimonials, team members, and contacts to the console.
 
 ## Building for Production
 
@@ -84,4 +117,4 @@ This template comes with [Tailwind CSS](https://tailwindcss.com/) already config
 
 ---
 
-Built with ❤️ using React Router.
+Built with ❤️ using React Router and AstrikS Team.
